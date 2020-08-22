@@ -2,7 +2,7 @@ import express from 'express';
 import passport from 'passport';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import models from './models'
+import models from './models';
 
 const app = express();
 
@@ -15,7 +15,6 @@ app.set('view engine', 'ejs');
 
 // make express look in the public directory for assets (css/js/img)
 app.use(express.static(__dirname + '/public'));
-
 
 app.use(cors());
 
@@ -33,11 +32,11 @@ require('./config/passport')(passport);
 
 //default route
 app.get('/', (req, res) => res.send('Hello my World'));
-
+require('./routes/registory')(app);
 require('./routes/user.js')(app);
 
 //create a server
-var server = app.listen(port, function() {
+var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;
 
