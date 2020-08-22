@@ -45,21 +45,17 @@ export const createLetterTemplate = (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 };
 export const createDepartment = (req, res) => {
-  const {
-    date,
-    department,
-    description,
-    location,
-    unitName,
-    newlocation,
-  } = req.body;
+  const { date, department, description, location } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO letter_template( department_date,department,description,location,unit_name,new_location) VALUES ("${date}","${department}","${description}","${location}","${unitName}","${newlocation}")`
+      `INSERT INTO department(department_date,department_code,description,location) VALUES ("${date}","${department}","${description}","${location}")`
     )
     .then((results) => {
       res.json({ results });
     })
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ err });
+    });
 };
