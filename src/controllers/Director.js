@@ -5,7 +5,7 @@ export const createRegistory = (req, res) => {
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO registory(Acknolegment_id,regisrory_date,tag_no,remarks) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}")`
+      `INSERT INTO registry(Acknolegment_id,registry_date,tag_no,remarks) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}")`
     )
     .then((results) => {
       res.json({ results });
