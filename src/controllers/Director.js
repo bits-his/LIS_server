@@ -21,7 +21,7 @@ export const createSiteFile = (req, res) => {
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO sit_file(sit_file_date,sit_no,compensation_purpose,remarks) VALUES ("${date}","${sitNo}","${compensationPurpose}","${remarks}")`
+      `INSERT INTO site_file(site_file_date,site_no,compensation_purpose,remarks) VALUES ("${date}","${sitNo}","${compensationPurpose}","${remarks}")`
     )
     .then((results) => {
       res.json({ results });
