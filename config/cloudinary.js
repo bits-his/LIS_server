@@ -16,3 +16,4 @@ exports.upload =(file)=>{
         )
     })
 }
+module.exports={cloudinary}
