@@ -1,11 +1,11 @@
 import db from '../models';
 
 export const createRegistory = (req, res) => {
-  const { acknowlegment_id, today, tag, remark } = req.body;
+  const { acknowlegment_id, today, tag, remark,forwardTo,from } = req.body;
   // console.log(data);
   db.sequelize
     .query(
-      `INSERT INTO registry(Acknolegment_id,registry_date,tag_no,remarks) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}")`
+      `INSERT INTO registry(Acknolegment_id,registry_date,tag_no,remarks,file_from,file_to) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}","${from}","${forwardTo}")`
     )
     .then(() => {
       db.sequelize.query(
@@ -108,3 +108,18 @@ export const getDepartment = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+export const getRegistry = (req, res) => {
+  db.sequelize
+    .query('SELECT registry_date,tag_no FROM `registry`')
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const getRemarks = (req, res) => {
+  const {tag_no} =req.params
+  db.sequelize
+    .query(`SELECT remarks FROM remarks WHERE tag_no="${tag_no}" order by id`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
