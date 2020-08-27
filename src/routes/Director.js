@@ -17,5 +17,5 @@ module.exports = (app) => {
   app.post('/api/directors/create', createDirectors);
   app.get('/api/get/department/code', getDepartment);
   app.get('/api/get/registry',getRegistry);
-  app.get('/api/get/remarks/:tag_no',getRemarks)
+  // app.get('/api/get/remarks/:tag_no',getRemarks)
 };

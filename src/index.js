@@ -41,64 +41,75 @@ require('./routes/user.js')(app);
 
 app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
   const data = req.files;
-  console.log(data)
-  if (data) {
-    let arr = [];
-    data.forEach((item) => {
-      arr.push(item.path);
-    });
-    let images = arr.join(',');
-    db.sequelize
-      .query(
-        `INSERT INTO registry(Acknolegment_id, registry_date, tag_no, images, remarks, file_from, file_to) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${images}","${req.body.remark}","${req.body.forwardTo}","${req.body.from}")`
-      )
-      .then(() => {
-        db.sequelize.query(
-          `INSERT INTO remarks(remarks_id,date_of_remarks,tag_no,remarks) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${req.body.remark}")`
-        );
-      })
-      .then((results) => res.json({ success: true, results }))
-      .catch((err) => res.json({ success: false, err }));
-  }
+  db.sequelize
+    .query(
+      `INSERT INTO registry(Acknolegment_id, registry_date, tag_no, remarks, file_from, file_to) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${req.body.remark}","${req.body.forwardTo}","${req.body.from}")`
+    )
+    .then(() => {
+      db.sequelize.query(
+        `INSERT INTO remarks(remarks_id,date_of_remarks,tag_no,remarks) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${req.body.remark}")`
+      );
+    })
+    .then(() => {
+      if (data) {
+       
+        data.forEach((item) => {
+          let arr = [];
+          arr.push(item.path);
+          db.sequelize.query(
+            `INSERT INTO image_table( image_url) VALUES ("${arr}")`
+          );
+        });
+      }
+    })
+    .then((results) => res.json({ success: true, results }))
+    .catch((err) => res.json({ success: false, err }));
 });
+
 app.post(
   '/api/letter/images/upload',
   uploadLetter.array('image'),
   (req, res) => {
-    const data = req.files;
-    if (req.files) {
-      let arr = [];
-      data.forEach((item) => {
-        arr.push(item.path);
-      });
-      let images = arr.join(',');
-      // console.log(req)
-      db.sequelize
-        .query(
-          `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks, image) VALUES ("${req.body.selectLetter}","${req.body.selectCC}","${req.body.remarks}","${images}")`
-        )
-        .then((results) => res.json({ success: true, results: results[0] }))
-        .catch((err) => res.status(500).json({ err }));
-    }
-  }
-);
-app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
-  const data = req.files;
-  if (data) {
-    console.log(req.body);
-    console.log(req.files);
-    let arr = [];
-    data.forEach((item) => {
-      arr.push(item.path);
-    });
-    let images = arr.join(',');
     db.sequelize
       .query(
-        `INSERT INTO surveyor_report(select_letter_template, selectedcc, remarks, image) VALUES ("${req.body.selectFile}","${req.body.selectTemplate}","${req.body.remarks}","${images}")`
+        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) VALUES ("${req.body.selectLetter}","${req.body.selectCC}","${req.body.remarks}")`
       )
+      .then(() => {
+        const data = req.files;
+        if (req.files) {
+          data.forEach((item) => {
+            let arr = [];
+            arr.push(item.path);
+            db.sequelize.query(
+              `INSERT INTO image_table( image_url) VALUES ("${arr}")`
+            );
+          });
+        }
+      })
       .then((results) => res.json({ success: true, results: results[0] }))
       .catch((err) => res.status(500).json({ err }));
   }
+);
+
+app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
+  const data = req.files;
+  db.sequelize
+    .query(
+      `INSERT INTO surveyor_report(select_letter_template, selectedcc, remarks) VALUES ("${req.body.selectFile}","${req.body.selectTemplate}","${req.body.remarks}")`
+    )
+    .then(() => {
+      if (data) {
+        data.forEach((item) => {
+          let arr = [];
+          arr.push(item.path);
+          db.sequelize.query(
+            `INSERT INTO image_table( image_url) VALUES ("${arr}")`
+          );
+        });
+      }
+    })
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
 });
 // app.post('/api/image/upload', async (req, res) => {
 //   try {
