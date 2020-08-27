@@ -17,7 +17,7 @@ export const createRegistory = (req, res) => {
 };
 
 export const createSiteFile = (req, res) => {
-  const { date, sitNo, purpose, type,remarks } = req.body;
+  const { date, sitNo, purpose, type, remarks } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
@@ -125,7 +125,6 @@ export const createDirectors = (req, res) => {
     });
 };
 export const getDepartment = (req, res) => {
-  const {} = req.params;
   db.sequelize
     .query('SELECT department_code FROM department')
     .then((results) => res.json({ success: true, results: results[0] }))
@@ -142,6 +141,14 @@ export const getRemarks = (req, res) => {
   const { tag_no } = req.params;
   db.sequelize
     .query(`SELECT remarks FROM remarks WHERE tag_no="${tag_no}" order by id`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const getDepartmentUnit = (req, res) => {
+  const {} = req.params;
+  db.sequelize
+    .query('SELECT * FROM departments_units')
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
