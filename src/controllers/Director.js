@@ -1,7 +1,7 @@
 import db from '../models';
 
 export const createRegistory = (req, res) => {
-  const { acknowlegment_id, today, tag, remark,forwardTo,from } = req.body;
+  const { acknowlegment_id, today, tag, remark, forwardTo, from } = req.body;
   // console.log(data);
   db.sequelize
     .query(
@@ -17,11 +17,11 @@ export const createRegistory = (req, res) => {
 };
 
 export const createSiteFile = (req, res) => {
-  const { date, sitNo, compensationPurpose, remarks } = req.body;
+  const { date, sitNo, purpose, type } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO site_file(site_file_date,site_no,compensation_purpose,remarks) VALUES ("${date}","${sitNo}","${compensationPurpose}","${remarks}")`
+      `INSERT INTO sit_file(sit_file_date,sit_no,purpose,type) VALUES ("${date}","${sitNo}","${purpose}","${type}")`
     )
     .then((results) => {
       res.json({ results });
@@ -47,43 +47,66 @@ export const createLetterTemplate = (req, res) => {
     })
     .catch((err) => res.status(500).json({ err }));
 };
+
 // export const createDepartment = (req, res) => {
-//   const { date, department, description, location } = req.body;
-//   console.log(req.body);
+//   const { data } = req.body;
+//   console.log(data);
 //   db.sequelize
 //     .query(
-//       `INSERT INTO department(department_date,department_code,description,location) VALUES ("${date}","${department}","${description}","${location}")`
+//       `INSERT INTO department(department_date,department_code,description,location) VALUES ("${req.body.date}","${req.body.department}","${req.body.description}","${req.body.location}")`
 //     )
-//     .then((results) => {
-//       res.json({ results });
+//     .then(() => {
+//       db.sequelize.query(
+//         `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ("${req.body.department}","${req.body.unitName}","${req.body.unit_location}")`
+//       );
 //     })
-//     .catch((err) => {
-//       console.log(err);
-//       res.status(500).json({ err });
-//     });
+//     .then((results) => res.json({ success: true, results }))
+//     .catch((err) => res.json({ success: false, err }));
 // };
 
 export const createDepartment = (req, res) => {
-  const {
-    date,
-    department,
-    description,
-    location,
-    unitName,
-    newlocation,
-  } = req.body;
-  // console.log(data);
+  const { date, department, description, location } = req.body;
+  console.log(req.body);
   db.sequelize
     .query(
       `INSERT INTO department(department_date,department_code,description,location) VALUES ("${date}","${department}","${description}","${location}")`
     )
-    .then(() => {
-      db.sequelize.query(
-        `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ("${department}","${unitName}","${newlocation}")`
-      );
-    })
+    // .then(() => {
+    //   db.sequelize.query(
+    //     `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ("${department}","${unitName}","${req.body.unit_location}")`
+    //   );
+    // })
     .then((results) => res.json({ success: true, results }))
     .catch((err) => res.json({ success: false, err }));
+};
+
+export const createDepartmentunit = (req, res) => {
+  const { data } = req.body;
+  console.log(data);
+  db.sequelize
+    .query(
+      `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ${data
+        .map((a) => '(?)')
+        .join(',')}`,
+      {
+        replacements: data,
+      }
+    )
+    // .then(() => {
+    //   db.sequelize.query(
+    //     `
+    //       .map((a) => '(?)')
+    //       .join(',')}`,
+    //     {
+    //       replacements: data,
+    //     }
+    //   );
+    // })
+    .then((results) => res.json({ success: true, results }))
+    .catch((err) => {
+      console.log(err);
+      res.json({ success: false, err });
+    });
 };
 
 export const createDirectors = (req, res) => {
@@ -116,10 +139,9 @@ export const getRegistry = (req, res) => {
 };
 
 export const getRemarks = (req, res) => {
-  const {tag_no} =req.params
+  const { tag_no } = req.params;
   db.sequelize
     .query(`SELECT remarks FROM remarks WHERE tag_no="${tag_no}" order by id`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
-
