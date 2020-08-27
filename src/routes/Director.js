@@ -9,6 +9,7 @@ import {
   getRegistry,
   getRemarks,
   getDepartmentUnit,
+  generatedId,
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -22,4 +23,5 @@ module.exports = (app) => {
   app.get('/api/get/registry', getRegistry);
   app.get('/api/get/remarks/:tag_no', getRemarks);
   app.get('/api/get/department_unit', getDepartmentUnit);
+  app.get('/api/generated_id', generatedId);
 };

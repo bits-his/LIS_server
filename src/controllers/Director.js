@@ -152,3 +152,21 @@ export const getDepartmentUnit = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
+export const generatedId = (req, res) => {
+  db.sequelize
+    .query(
+      'SELECT CONCAT(IFNULL(MAX(id), 0) + 1) AS acknowlegment FROM registry'
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+// export const getGeneratedId  = (req, res) => {
+//   db.sequelize
+//     .query(
+//       'SELECT CONCAT(6000, IFNULL(MAX(id), 0) + 1) AS item_code FROM item_discription_tables'
+//     )
+//     .then((results) => res.json({ item_code: results[0][0].item_code }))
+//     .catch((err) => res.status(500).json({ err }));
+// };
