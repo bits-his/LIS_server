@@ -125,7 +125,6 @@ export const createDirectors = (req, res) => {
     });
 };
 export const getDepartment = (req, res) => {
-  const {} = req.params;
   db.sequelize
     .query('SELECT department_code FROM department')
     .then((results) => res.json({ success: true, results: results[0] }))
