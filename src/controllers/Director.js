@@ -152,3 +152,27 @@ export const getDepartmentUnit = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
+export const generatedId = (req, res) => {
+  db.sequelize
+    .query(
+      'SELECT CONCAT(IFNULL(MAX(id), 0) + 1) AS acknowlegment FROM registry'
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const updateRegistry = (req, res) => {
+  db.sequelize
+    .query(
+      
+      `UPDATE registry set file_to="${req.body.ps}" where tag_no="${req.body.tagNo}"`
+    )
+    .then(() => {
+      db.sequelize.query(
+        `INSERT INTO remarks(tag_no, remarks) VALUES ("${req.body.tagNo}","${req.body.remark}")`
+      );
+    })
+    .then((results) => res.json({ success: true}))
+    .catch((err) => res.status(500).json({ err }));
+};
