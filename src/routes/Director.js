@@ -10,6 +10,7 @@ import {
   getRemarks,
   getDepartmentUnit,
   generatedId,
+  updateRegistry,
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -24,4 +25,5 @@ module.exports = (app) => {
   app.get('/api/get/remarks/:tag_no', getRemarks);
   app.get('/api/get/department_unit', getDepartmentUnit);
   app.get('/api/generated_id', generatedId);
+  app.post('/api/update/registry', updateRegistry);
 };

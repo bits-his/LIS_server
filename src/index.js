@@ -43,7 +43,7 @@ app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
   const data = req.files;
   db.sequelize
     .query(
-      `INSERT INTO registry(Acknolegment_id, registry_date, tag_no, remarks, file_from, file_to) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${req.body.remark}","${req.body.forwardTo}","${req.body.from}")`
+      `INSERT INTO registry(Acknolegment_id, registry_date, tag_no, remarks, file_from, file_to) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${req.body.remark}","${req.body.from}","${req.body.forwardTo}")`
     )
     .then(() => {
       db.sequelize.query(
