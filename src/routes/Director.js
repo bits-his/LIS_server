@@ -11,6 +11,9 @@ import {
   getDepartmentUnit,
   generatedId,
   updateRegistry,
+  getMailBadge,
+  getLetterTemplateName,
+  getLetterBody
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -26,4 +29,7 @@ module.exports = (app) => {
   app.get('/api/get/department_unit', getDepartmentUnit);
   app.get('/api/generated_id', generatedId);
   app.post('/api/update/registry', updateRegistry);
+  app.get('/api/get/mail/badge',getMailBadge);
+  app.get('/api/get/letter/template/name',getLetterTemplateName);
+  app.get('/api/get/letter/body/:letter',getLetterBody)
 };

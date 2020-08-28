@@ -40,7 +40,7 @@ export const createLetterTemplate = (req, res) => {
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO letter_template( template_date,department,name,description,purpose,letter_body) VALUES ("${today}","${department}","${name}","${description}","${purpose}","${letter_body}")`
+      `INSERT INTO letter_template( template_date,department,name,description,purpose,letter_body) VALUES ("${today}","${department}","${name}","${description}","${purpose}",'${letter_body}')`
     )
     .then((results) => {
       res.json({ results });
@@ -165,7 +165,6 @@ export const generatedId = (req, res) => {
 export const updateRegistry = (req, res) => {
   db.sequelize
     .query(
-      
       `UPDATE registry set file_to="${req.body.ps}" where tag_no="${req.body.tagNo}"`
     )
     .then(() => {
@@ -173,6 +172,28 @@ export const updateRegistry = (req, res) => {
         `INSERT INTO remarks(tag_no, remarks) VALUES ("${req.body.tagNo}","${req.body.remark}")`
       );
     })
-    .then((results) => res.json({ success: true}))
+    .then((results) => res.json({ success: true }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const getMailBadge = (req, res) => {
+  db.sequelize
+    .query('SELECT COUNT(file_to) as Ps FROM registry  WHERE file_to="PS"')
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const getLetterTemplateName = (req, res) => {
+  db.sequelize
+    .query(`SELECT name FROM letter_template`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const getLetterBody = (req, res) => {
+  const { letter } = req.params;
+  db.sequelize
+    .query(`SELECT letter_body FROM letter_template where name="${letter}"`)
+    .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
