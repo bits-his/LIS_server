@@ -132,7 +132,9 @@ export const getDepartment = (req, res) => {
 };
 export const getRegistry = (req, res) => {
   db.sequelize
-    .query('SELECT registry_date,tag_no FROM `registry`')
+    .query(
+      'SELECT Acknolegment_id,registry_date,tag_no,remarks,inserted_by FROM `registry`'
+    )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
@@ -197,3 +199,11 @@ export const getLetterBody = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
+// export const getLetterBody = (req, res) => {
+//   const { letter } = req.params;
+//   db.sequelize
+//     .query(`SELECT letter_body FROM letter_template where name="${letter}"`)
+//     .then((results) => res.json({ success: true, results: results[0] }))
+//     .catch((err) => res.status(500).json({ err }));
+// };
