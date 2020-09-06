@@ -72,7 +72,7 @@ app.post(
   (req, res) => {
     db.sequelize
       .query(
-        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) VALUES ("${req.body.selectLetter}","${req.body.selectCC}","${req.body.remarks}")`
+        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) VALUES ('${req.body.selectLetter}','${req.body.selectCC}','${req.body.remarks}')`
       )
       .then(() => {
         const data = req.files;
@@ -86,7 +86,7 @@ app.post(
           });
         }
       })
-      .then((results) => res.json({ success: true, results: results[0] }))
+      .then((results) => res.json({ success: true,results }))
       .catch((err) => res.status(500).json({ err }));
   }
 );
@@ -108,7 +108,7 @@ app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
         });
       }
     })
-    .then((results) => res.json({ success: true, results: results[0] }))
+    .then((results) => res.json({ success: true,results }))
     .catch((err) => res.status(500).json({ err }));
 });
 // app.post('/api/image/upload', async (req, res) => {
