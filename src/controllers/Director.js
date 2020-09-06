@@ -165,6 +165,7 @@ export const generatedId = (req, res) => {
 };
 
 export const updateRegistry = (req, res) => {
+console.log(req.body)
   db.sequelize
     .query(
       `UPDATE registry set file_to="${req.body.ps}" where tag_no="${req.body.tagNo}"`
@@ -174,8 +175,8 @@ export const updateRegistry = (req, res) => {
         `INSERT INTO remarks(tag_no, remarks) VALUES ("${req.body.tagNo}","${req.body.remark}")`
       );
     })
-    .then((results) => res.json({ success: true }))
-    .catch((err) => res.status(500).json({ err }));
+    .then((results) => res.json({ success: true, results }))
+    .catch((err) => res.json({ success: false, err }));
 };
 
 export const getMailBadge = (req, res) => {
