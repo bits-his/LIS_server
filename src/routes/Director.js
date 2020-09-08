@@ -13,11 +13,18 @@ import {
   updateRegistry,
   getMailBadge,
   getLetterTemplateName,
-  getLetterBody
+  getLetterBody,
+  createRateCharge,
+  getUseRateCat,
+  getReviewRange,
+  getGroundRent
 } from '../controllers/Director';
 
 module.exports = (app) => {
   app.post('/api/registory/create', createRegistory);
+  app.get('/api/use/rate/cat', getUseRateCat);
+  app.get('/api/get/review/range', getReviewRange);
+  app.post('/api/rate/charge', createRateCharge);
   app.post('/api/site_file/create', createSiteFile);
   app.post('/api/letter_template/create', createLetterTemplate);
   app.post('/api/departmentunit/create', createDepartmentunit);
@@ -32,4 +39,5 @@ module.exports = (app) => {
   app.get('/api/get/mail/badge',getMailBadge);
   app.get('/api/get/letter/template/name',getLetterTemplateName);
   app.get('/api/get/letter/body/:letter',getLetterBody)
+  app.get('/api/get/groundrent/:land/:range',getGroundRent)
 };
