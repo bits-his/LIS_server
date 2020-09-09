@@ -7,6 +7,7 @@ export default (sequelize, DataTypes) => {
       email: DataTypes.STRING,
       password: DataTypes.STRING,
       role: DataTypes.STRING,
+      accessTo:DataTypes.STRING
     },
     {}
   );

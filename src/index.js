@@ -53,10 +53,14 @@ app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
     .then(() => {
       if (data) {
         data.forEach((item) => {
+          console.log(data)
           let arr = [];
+          
           arr.push(item.path);
+          arr.push(req.body.tag)
+          console.log(arr)
           db.sequelize.query(
-            `INSERT INTO image_table( image_url) VALUES ("${arr}")`,
+            `INSERT INTO image_table(id, image_url) VALUES ("${arr[1]}","${arr[0]}")`,
           );
         });
       }
