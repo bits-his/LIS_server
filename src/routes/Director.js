@@ -17,7 +17,11 @@ import {
   createRateCharge,
   getUseRateCat,
   getReviewRange,
-  getGroundRent
+  getGroundRent,
+  getMailTable,
+  getImagesURL,
+  getImageRemark,
+  createUser
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -30,9 +34,13 @@ module.exports = (app) => {
   app.post('/api/departmentunit/create', createDepartmentunit);
   app.post('/api/department/create', createDepartment);
   app.post('/api/directors/create', createDirectors);
+  app.post('/api/create/user',createUser);
   app.get('/api/get/department', getDepartment);
   app.get('/api/get/registry', getRegistry);
+  app.get('/api/get/mail/table',getMailTable)
   app.get('/api/get/remarks/:tag_no', getRemarks);
+  app.get('/api/get/images/URL/:id',getImagesURL)
+  app.get('/api/get/imageRemark/:id',getImageRemark)
   app.get('/api/get/department_unit', getDepartmentUnit);
   app.get('/api/generated_id', generatedId);
   app.post('/api/update/registry', updateRegistry);

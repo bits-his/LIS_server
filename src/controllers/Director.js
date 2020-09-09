@@ -26,6 +26,22 @@ export const createSiteFile = (req, res) => {
     .then((results) => res.json({ success: true }))
       .catch((err) => res.status(500).json({ err }));
 };
+export const createUser= (req, res) => {
+ const  { firstname,
+    lastname,
+    username,
+    email,
+    password,
+    role,
+    accessTo } =req.body
+  console.log(req.body);
+  db.sequelize
+    .query(
+      `INSERT INTO users( lastname, role, accessTo, username, email, password) VALUES ("${lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
+    )
+    .then((results) => res.json({ success: true }))
+      .catch((err) => res.status(500).json({ err }));
+};
 export const createLetterTemplate = (req, res) => {
   const {
     today,
@@ -127,7 +143,7 @@ export const getDepartment = (req, res) => {
 export const getRegistry = (req, res) => {
   db.sequelize
     .query(
-      'SELECT Acknolegment_id,registry_date,tag_no,remarks,inserted_by FROM registry where file_to="Ps"'
+      'SELECT Acknolegment_id,registry_date,tag_no,remarks,inserted_by FROM registry where file_to="PS Secretary"'
     )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
@@ -175,7 +191,13 @@ console.log(req.body)
 
 export const getMailBadge = (req, res) => {
   db.sequelize
-    .query('SELECT COUNT(file_to) as Ps FROM registry  WHERE file_to="PS"')
+    .query('SELECT COUNT(file_to) as Ps FROM registry  WHERE file_to="Ps"')
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+export const getMailTable = (req, res) => {
+  db.sequelize
+    .query('SELECT * FROM registry  WHERE file_to="Ps"')
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
@@ -215,6 +237,21 @@ export const getUseRateCat = (req, res) => {
 export const getReviewRange = (req, res) => {
   db.sequelize
     .query(`SELECT DISTINCT review_range FROM ground_rent`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const getImagesURL = (req, res) => {
+  const { id } = req.params;
+  db.sequelize
+    .query(`SELECT image_url FROM image_table WHERE id="${id}"`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+export const getImageRemark = (req, res) => {
+  const { id } = req.params;
+  db.sequelize
+    .query(`SELECT remarks FROM remarks WHERE tag_no="${id}"`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
