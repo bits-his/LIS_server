@@ -265,3 +265,11 @@ export const getDepartment_Position = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
+export const getPostion = (req, res) => {
+  const { id } = req.params;
+  db.sequelize
+.query(`CALL get_position()`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
