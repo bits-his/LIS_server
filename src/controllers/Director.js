@@ -33,11 +33,14 @@ export const createUser= (req, res) => {
     email,
     password,
     role,
-    accessTo } =req.body
+    accessTo,
+    department,
+    position
+   } =req.body
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO users( lastname, role, accessTo, username, email, password) VALUES ("${lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
+      `INSERT INTO users(department,position, lastname, role, accessTo, username, email, password) VALUES ("${department}","${position}","${lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
     )
     .then((results) => res.json({ success: true }))
       .catch((err) => res.status(500).json({ err }));
@@ -252,6 +255,21 @@ export const getImageRemark = (req, res) => {
   const { id } = req.params;
   db.sequelize
     .query(`SELECT remarks FROM remarks WHERE tag_no="${id}"`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+export const getDepartment_Position = (req, res) => {
+  const { id } = req.params;
+  db.sequelize
+.query(`call get_department_position()`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const getPostion = (req, res) => {
+  const { id } = req.params;
+  db.sequelize
+.query(`CALL get_position()`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };

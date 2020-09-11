@@ -12,7 +12,8 @@ import validateLoginForm from '../validation/login';
 // create user
 const create = (req, res) => {
   const { errors, isValid } = validateRegisterForm(req.body);
-  let { name, email, password } = req.body;
+  let { name, email, password,position,accessTo,role,
+    department } = req.body;
   errors.success = false;
 
   // check validation
@@ -29,9 +30,11 @@ const create = (req, res) => {
       let newUser = {
         name,
         // username,
-        role: '2',
+        role: role?role:'',
         email,
         password,
+        position,accessTo,
+        department
       };
       bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newUser.password, salt, (err, hash) => {

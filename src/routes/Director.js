@@ -21,7 +21,9 @@ import {
   getMailTable,
   getImagesURL,
   getImageRemark,
-  createUser
+  createUser,
+  getDepartment_Position,
+  getPostion
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -29,6 +31,8 @@ module.exports = (app) => {
   app.get('/api/use/rate/cat', getUseRateCat);
   app.get('/api/get/review/range', getReviewRange);
   app.post('/api/rate/charge', createRateCharge);
+  app.get('/api/get/department/position',getDepartment_Position)
+  app.get('/api/get/position',getPostion)
   app.post('/api/site_file/create', createSiteFile);
   app.post('/api/letter_template/create', createLetterTemplate);
   app.post('/api/departmentunit/create', createDepartmentunit);
