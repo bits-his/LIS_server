@@ -7,7 +7,7 @@ require('dotenv').config();
 
 const basename = path.basename(__filename);
 
-const config = {
+const config2 = {
   username: "root",
   password: "",
   database: "lis",
@@ -20,7 +20,19 @@ const config = {
     idle: 10000,
   },
 };
-
+const config = {
+  username: "b1a660636ee11e",
+  password: "9cc268a8",
+  database: "heroku_8d5b9679140b812",
+  host: "us-cdbr-east-02.cleardb.com",
+  dialect: "mysql",
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+};
 const db = {};
 
 let sequelize;
