@@ -23,7 +23,8 @@ import {
   getImageRemark,
   createUser,
   getDepartment_Position,
-  getPostion
+  getPostion,
+  getUnit
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -52,4 +53,5 @@ module.exports = (app) => {
   app.get('/api/get/letter/template/name',getLetterTemplateName);
   app.get('/api/get/letter/body/:letter',getLetterBody)
   app.get('/api/get/groundrent/:land/:range',getGroundRent)
+  app.get('/api/get/unit/:department',getUnit)
 };

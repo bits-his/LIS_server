@@ -192,4 +192,7 @@ const deleteUser = (req, res) => {
     .catch((err) => res.status(500).json({ msg: 'Failed to delete!' }));
 };
 
+
+
+
 export { create, login, findAllUsers, findById, update, deleteUser };

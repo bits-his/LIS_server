@@ -143,6 +143,12 @@ export const getDepartment = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+export const getUnit = (req, res) => {
+  db.sequelize
+    .query(`SELECT unit_name FROM departments_units where department_code="${req.params.department}"`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
 export const getRegistry = (req, res) => {
   db.sequelize
     .query(
