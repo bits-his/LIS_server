@@ -24,10 +24,11 @@ export const createSiteFile = (req, res) => {
       `INSERT INTO sit_file(sit_file_date,sit_no,purpose,type,remarks) VALUES ("${date}","${sitNo}","${purpose}","${type}","${remarks}")`
     )
     .then((results) => res.json({ success: true }))
-      .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ err }));
 };
-export const createUser= (req, res) => {
- const  { firstname,
+export const createUser = (req, res) => {
+  const {
+    firstname,
     lastname,
     username,
     email,
@@ -35,15 +36,15 @@ export const createUser= (req, res) => {
     role,
     accessTo,
     department,
-    position
-   } =req.body
+    position,
+  } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
       `INSERT INTO users(department,position, lastname, role, accessTo, username, email, password) VALUES ("${department}","${position}","${lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
     )
     .then((results) => res.json({ success: true }))
-      .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ err }));
 };
 export const createLetterTemplate = (req, res) => {
   const {
@@ -137,6 +138,36 @@ export const createDirectors = (req, res) => {
       res.status(500).json({ err });
     });
 };
+
+export const createApplication = (req, res) => {
+  const {
+    today,
+    form_no,
+    application_type,
+    application_name,
+    amount,
+    address,
+    phone,
+    other_Info,
+    tp_no,
+    land_no,
+    amount_paid,
+    reciept_no,
+  } = req.body;
+  console.log(req.body);
+  db.sequelize
+    .query(
+      `INSERT INTO application_form(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no) VALUES ("${today}","${form_no}","${application_type}","${application_name}","${amount}","${address}","${phone}","${other_Info}","${tp_no}","${land_no}","${amount_paid}","${reciept_no}")`
+    )
+    .then((results) => {
+      res.json({ results });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ err });
+    });
+};
+
 export const getDepartment = (req, res) => {
   db.sequelize
     .query('SELECT department_code FROM department')
@@ -184,7 +215,7 @@ export const generatedId = (req, res) => {
 };
 
 export const updateRegistry = (req, res) => {
-console.log(req.body)
+  console.log(req.body);
   db.sequelize
     .query(
       `UPDATE registry set file_to="${req.body.ps}" where tag_no="${req.body.tagNo}"`
@@ -226,13 +257,14 @@ export const getLetterBody = (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 };
 export const getGroundRent = (req, res) => {
-  const { land,range } = req.params;
+  const { land, range } = req.params;
   db.sequelize
-    .query(`call get_ground_rent(:land,:range)`,{
+    .query(`call get_ground_rent(:land,:range)`, {
       replacements: {
         land,
-        range
-      }})
+        range,
+      },
+    })
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
@@ -267,7 +299,7 @@ export const getImageRemark = (req, res) => {
 export const getDepartment_Position = (req, res) => {
   const { id } = req.params;
   db.sequelize
-.query(`call get_department_position()`)
+    .query(`call get_department_position()`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
@@ -275,7 +307,7 @@ export const getDepartment_Position = (req, res) => {
 export const getPostion = (req, res) => {
   const { id } = req.params;
   db.sequelize
-.query(`CALL get_position()`)
+    .query(`CALL get_position()`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
