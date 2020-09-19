@@ -1,18 +1,18 @@
 'use strict';
 
-import fs  from 'fs';
-import path  from 'path';
-import Sequelize  from 'sequelize';
+import fs from 'fs';
+import path from 'path';
+import Sequelize from 'sequelize';
 require('dotenv').config();
 
 const basename = path.basename(__filename);
 
-const config = {
-  username: "root",
-  password: "",
-  database: "lis",
-  host: "localhost",
-  dialect: "mysql",
+const config1 = {
+  username: 'root',
+  password: '',
+  database: 'lis',
+  host: 'localhost',
+  dialect: 'mysql',
   pool: {
     max: 5,
     min: 0,
@@ -20,12 +20,12 @@ const config = {
     idle: 10000,
   },
 };
-const config2 = {
-  username: "b1a660636ee11e",
-  password: "9cc268a8",
-  database: "heroku_8d5b9679140b812",
-  host: "us-cdbr-east-02.cleardb.com",
-  dialect: "mysql",
+const config = {
+  username: 'b1a660636ee11e',
+  password: '9cc268a8',
+  database: 'heroku_8d5b9679140b812',
+  host: 'us-cdbr-east-02.cleardb.com',
+  dialect: 'mysql',
   pool: {
     max: 5,
     min: 0,
@@ -39,20 +39,26 @@ let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+  sequelize = new Sequelize(
+    config.database,
+    config.username,
+    config.password,
+    config
+  );
 }
 
-fs
-  .readdirSync(__dirname)
-  .filter(file => {
-    return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
+fs.readdirSync(__dirname)
+  .filter((file) => {
+    return (
+      file.indexOf('.') !== 0 && file !== basename && file.slice(-3) === '.js'
+    );
   })
-  .forEach(file => {
+  .forEach((file) => {
     const model = sequelize['import'](path.join(__dirname, file));
     db[model.name] = model;
   });
 
-Object.keys(db).forEach(modelName => {
+Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
