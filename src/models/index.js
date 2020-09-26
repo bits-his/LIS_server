@@ -7,12 +7,12 @@ require('dotenv').config();
 
 const basename = path.basename(__filename);
 
-const config1 = {
-  username: 'root',
-  password: '',
-  database: 'lis',
+const config = {
+  username: 'dangana',
+  password: 'dangana2020',
+  database: 'land',
   host: 'localhost',
-  dialect: 'mysql',
+  dialect: 'postgresql',
   pool: {
     max: 5,
     min: 0,
@@ -20,7 +20,7 @@ const config1 = {
     idle: 10000,
   },
 };
-const config = {
+const config1 = {
   username: 'b1a660636ee11e',
   password: '9cc268a8',
   database: 'heroku_8d5b9679140b812',

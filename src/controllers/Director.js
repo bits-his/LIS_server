@@ -83,52 +83,57 @@ export const createDepartment = (req, res) => {
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO department(department_date,department_code,description,location) VALUES ("${date}","${department}","${description}","${location}")`
+      `INSERT INTO department(department_date,department_code,description,location) VALUES ('${date}','${department}','${description}','${location}')`
     )
-    // .then(() => {
-    //   db.sequelize.query(
-    //     `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ("${department}","${unitName}","${req.body.unit_location}")`
-    //   );
-    // })
+    .then(() => {
+      db.sequelize.query(
+        `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ${req.body.Data.map(
+          (a) => '(?)'
+        ).join(',')}`,
+        {
+          replacements: req.body.Data,
+        }
+      );
+    })
     .then((results) => res.json({ success: true, results }))
     .catch((err) => res.json({ success: false, err }));
 };
 
-export const createDepartmentunit = (req, res) => {
-  const { data } = req.body;
-  console.log(data);
-  db.sequelize
-    .query(
-      `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ${data
-        .map((a) => '(?)')
-        .join(',')}`,
-      {
-        replacements: data,
-      }
-    )
-    // .then(() => {
-    //   db.sequelize.query(
-    //     `
-    //       .map((a) => '(?)')
-    //       .join(',')}`,
-    //     {
-    //       replacements: data,
-    //     }
-    //   );
-    // })
-    .then((results) => res.json({ success: true, results }))
-    .catch((err) => {
-      console.log(err);
-      res.json({ success: false, err });
-    });
-};
+// export const createDepartmentunit = (req, res) => {
+//   const { data } = req.body;
+//   console.log(data);
+//   db.sequelize
+//     .query(
+//       `INSERT INTO departments_units(department_code,unit_name,unit_location) VALUES ${data
+//         .map((a) => '(?)')
+//         .join(',')}`,
+//       {
+//         replacements: data,
+//       }
+//     )
+//     // .then(() => {
+//     //   db.sequelize.query(
+//     //     `
+//     //       .map((a) => '(?)')
+//     //       .join(',')}`,
+//     //     {
+//     //       replacements: data,
+//     //     }
+//     //   );
+//     // })
+//     .then((results) => res.json({ success: true, results }))
+//     .catch((err) => {
+//       console.log(err);
+//       res.json({ success: false, err });
+//     });
+// };
 
 export const createDirectors = (req, res) => {
   const { department, position, unit, position_name } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO directors(department,position,other_unit_name,other_position) VALUES ("${department}","${position}","${unit}","${position_name}")`
+      `INSERT INTO directors(department,position,other_unit_name,other_position) VALUES ('${department}','${position}','${unit}','${position_name}')`
     )
     .then((results) => {
       res.json({ results });
@@ -153,11 +158,12 @@ export const createApplication = (req, res) => {
     land_no,
     amount_paid,
     reciept_no,
+    application,
   } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO application_form(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no) VALUES ("${today}","${form_no}","${application_type}","${application_name}","${amount}","${address}","${phone}","${other_Info}","${tp_no}","${land_no}","${amount_paid}","${reciept_no}")`
+      `INSERT INTO application_form(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no,status) VALUES ('${today}','${form_no}','${application_type}','${application_name}','${amount}','${address}','${phone}','${other_Info}','${tp_no}','${land_no}','${amount_paid}','${reciept_no}','${application}')`
     )
     .then((results) => {
       res.json({ results });
@@ -176,7 +182,9 @@ export const getDepartment = (req, res) => {
 };
 export const getUnit = (req, res) => {
   db.sequelize
-    .query(`SELECT unit_name FROM departments_units where department_code="${req.params.department}"`)
+    .query(
+      `SELECT unit_name FROM departments_units where department_code='${req.params.department}'`
+    )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
@@ -311,3 +319,20 @@ export const getPostion = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+export const directorLand = (req, res) => {
+  const { id } = req.body;
+  db.sequelize
+    .query(
+      `update public.application_form set status='Director Land' where file_no='${id}' `
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+export const get_application_form = (req, res) => {
+  // console.log(req.params[0].position);
+  db.sequelize
+    .query(`SELECT * FROM public.application_form where status='Director Land'`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+// where status='New' and forward_to='${req.params[0].position}'

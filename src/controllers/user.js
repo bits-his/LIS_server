@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
+import moment from 'moment';
 
 import db from '../models';
 const User = db.User;
@@ -12,45 +13,67 @@ import validateLoginForm from '../validation/login';
 // create user
 const create = (req, res) => {
   const { errors, isValid } = validateRegisterForm(req.body);
-  let { name, email, password,position,accessTo,role,
-    department } = req.body;
+  let {
+    name,
+    email,
+    password,
+    position,
+    accessTo,
+    role,
+    department,
+    accessToDept,
+    id,
+  } = req.body;
   errors.success = false;
 
   // check validation
   if (!isValid) {
     return res.status(400).json(errors);
   }
+  let _id = moment().format('DDMMyyyyhhmmss');
+  console.log(_id);
 
-  User.findAll({ where: { email } }).then((user) => {
-    if (user.length) {
-      return res
-        .status(400)
-        .json({ success: false, email: 'Email already exists!' });
-    } else {
-      let newUser = {
-        name,
-        // username,
-        role: role?role:'',
-        email,
-        password,
-        position,accessTo,
-        department
-      };
-      bcrypt.genSalt(10, (err, salt) => {
-        bcrypt.hash(newUser.password, salt, (err, hash) => {
-          if (err) throw err;
-          newUser.password = hash;
-          User.create(newUser)
-            .then((user) => {
-              res.json({ success: true, user });
-            })
-            .catch((err) => {
-              res.status(500).json({ success: false, err });
-            });
+  // User.findAll({ where: { email } }).then((user) => {
+  db.sequelize
+    .query(`SELECT * FROM public.users WHERE email='${email}'`)
+    .then((user) => {
+      if (user[0].length) {
+        return res
+          .status(400)
+          .json({ success: false, email: 'Email already exists!' });
+      } else {
+        let newUser = {
+          name,
+          // username,
+          role: role ? role : '',
+          email,
+          password,
+          position,
+          accessTo,
+          department,
+          accessToDept,
+          id,
+        };
+        console.log(newUser);
+        bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newUser.password, salt, (err, hash) => {
+            if (err) throw err;
+            newUser.password = hash;
+            // User.create(newUser)
+            db.sequelize
+              .query(
+                `INSERT INTO public."users" ("id","name","email","password","role","accessTo","position","department","accessToDept") VALUES ('${_id}', '${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')`
+              )
+              .then((user) => {
+                res.json({ success: true, user });
+              })
+              .catch((err) => {
+                res.status(500).json({ success: false, err });
+              });
+          });
         });
-      });
-    }
-  });
+      }
+    });
 };
 
 export const verifyUserToken = (req, res) => {
@@ -68,8 +91,11 @@ export const verifyUserToken = (req, res) => {
 
     const { id } = decoded;
 
-    User.findAll({ where: { id } })
-      .then((user) => {
+    // User.findAll({ where: { id } })
+    db.sequelize
+      .query(`SELECT * FROM public.users WHERE id='${id}'`)
+      .then((found) => {
+        let user = found[0];
         if (!user.length) {
           return res.json({ msg: 'user not found' });
         }
@@ -79,7 +105,10 @@ export const verifyUserToken = (req, res) => {
           user: user[0],
         });
       })
-      .catch((err) => res.status(500).json({ success: false, err }));
+      .catch((err) => {
+        res.status(500).json({ success: false, err });
+        console.log(err);
+      });
   });
 };
 
@@ -93,19 +122,23 @@ const login = (req, res) => {
 
   const { email, password } = req.body;
 
-  User.findAll({
-    where: {
-      email,
-    },
-  })
-    .then((user) => {
+  // User.findAll({
+  //   where: {
+  //     email,
+  //   },
+  // })
+  db.sequelize
+    .query(`SELECT * FROM public.users WHERE email='${email}'`)
+    .then((found) => {
+      let user = found[0];
+      console.log(user);
       //check for user
       if (!user.length) {
         errors.email = 'User not found!';
         return res.status(404).json(errors);
       }
 
-      let originalPassword = user[0].dataValues.password;
+      let originalPassword = user[0].password;
 
       //check for password
       bcrypt
@@ -114,7 +147,7 @@ const login = (req, res) => {
           if (isMatch) {
             // user matched
             console.log('matched!');
-            const { id, username } = user[0].dataValues;
+            const { id, username } = user[0];
             const payload = { id, username }; //jwt payload
             // console.log(payload)
 
@@ -128,24 +161,30 @@ const login = (req, res) => {
                 res.json({
                   success: true,
                   token: 'Bearer ' + token,
-                  role: user[0].dataValues.role,
+                  role: user[0].role,
                 });
-              },
+              }
             );
           } else {
             errors.password = 'Password not correct';
             errors.success = false;
+            console.log(errors);
             return res.status(400).json(errors);
           }
         })
         .catch((err) => console.log(err));
     })
-    .catch((err) => res.status(500).json({ success: false, err }));
+    .catch((err) => {
+      res.status(500).json({ success: false, err });
+      console.log(err);
+    });
 };
 
 // fetch all users
 const findAllUsers = (req, res) => {
-  User.findAll()
+  // User.findAll()
+  db.sequelize
+    .query(`SELECT * FROM public.users `)
     .then((user) => {
       res.json({ user });
     })
@@ -156,7 +195,9 @@ const findAllUsers = (req, res) => {
 const findById = (req, res) => {
   const id = req.params.userId;
 
-  User.findAll({ where: { id } })
+  // User.findAll({ where: { id } })
+  db.sequelize
+    .query(`SELECT * FROM public.users `)
     .then((user) => {
       if (!user.length) {
         return res.json({ msg: 'user not found' });
@@ -177,7 +218,7 @@ const update = (req, res) => {
       lastname,
       role,
     },
-    { where: { id } },
+    { where: { id } }
   )
     .then((user) => res.status(200).json({ user }))
     .catch((err) => res.status(500).json({ err }));
@@ -191,8 +232,5 @@ const deleteUser = (req, res) => {
     .then(() => res.status.json({ msg: 'User has been deleted successfully!' }))
     .catch((err) => res.status(500).json({ msg: 'Failed to delete!' }));
 };
-
-
-
 
 export { create, login, findAllUsers, findById, update, deleteUser };

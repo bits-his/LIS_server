@@ -12,9 +12,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-let port = process.env.PORT || 8080;
-
-// set the view engine to ejs
+let port = process.env.PORT || 8080; // set the view engine to ejs
 app.set('view engine', 'ejs');
 
 // make express look in the public directory for assets (css/js/img)
@@ -38,29 +36,39 @@ require('./config/passport')(passport);
 app.get('/', (req, res) => res.send('Hello my World'));
 require('./routes/Director.js')(app);
 require('./routes/user.js')(app);
-
 app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
   const data = req.files;
+  const {
+    today,
+    form_no,
+    application_type,
+    application_name,
+    amount,
+    address,
+    phone,
+    other_Info,
+    tp_no,
+    land_no,
+    amount_paid,
+    reciept_no,
+    application,
+  } = req.body;
+  console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO registry(Acknolegment_id, registry_date, tag_no, remarks, file_from, file_to) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${req.body.remark}","${req.body.from}","${req.body.forwardTo}")`,
+      `INSERT INTO application_form(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no,status,forward_to) VALUES ('${today}','${form_no}','${application_type}','${application_name}','${amount}','${address}','${phone}','${other_Info}','${tp_no}','${land_no}','${amount_paid}','${reciept_no}','${application}','Director Land')`
     )
-    .then(() => {
-      db.sequelize.query(
-        `INSERT INTO remarks(remarks_id,date_of_remarks,tag_no,remarks) VALUES ("${req.body.acknowlegment_id}","${req.body.today}","${req.body.tag}","${req.body.remark}")`,
-      );
-    })
     .then(() => {
       if (data) {
         data.forEach((item) => {
-          console.log(data)
+          console.log(data);
           let arr = [];
-          
+
           arr.push(item.path);
-          arr.push(req.body.tag)
-          console.log(arr)
+          arr.push(req.body.form_no);
+          console.log(arr);
           db.sequelize.query(
-            `INSERT INTO image_table(id, image_url) VALUES ("${arr[1]}","${arr[0]}")`,
+            `INSERT INTO image_table(id, image_url) VALUES ('${arr[1]}','${arr[0]}')`
           );
         });
       }
@@ -75,7 +83,7 @@ app.post(
   (req, res) => {
     db.sequelize
       .query(
-        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) VALUES ('${req.body.selectLetter}','${req.body.selectCC}','${req.body.remarks}')`,
+        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) VALUES ('${req.body.selectLetter}','${req.body.selectCC}','${req.body.remarks}')`
       )
       .then(() => {
         const data = req.files;
@@ -84,21 +92,21 @@ app.post(
             let arr = [];
             arr.push(item.path);
             db.sequelize.query(
-              `INSERT INTO image_table( image_url) VALUES ("${arr}")`,
+              `INSERT INTO image_table( image_url) VALUES ("${arr}")`
             );
           });
         }
       })
       .then((results) => res.json({ success: true, results }))
       .catch((err) => res.status(500).json({ err }));
-  },
+  }
 );
 
 app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
   const data = req.files;
   db.sequelize
     .query(
-      `INSERT INTO surveyor_report(select_letter_template, selectedcc, remarks) VALUES ("${req.body.selectFile}","${req.body.selectTemplate}","${req.body.remarks}")`,
+      `INSERT INTO surveyor_report(select_letter_template, selectedcc, remarks) VALUES ("${req.body.selectFile}","${req.body.selectTemplate}","${req.body.remarks}")`
     )
     .then(() => {
       if (data) {
@@ -106,7 +114,7 @@ app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
           let arr = [];
           arr.push(item.path);
           db.sequelize.query(
-            `INSERT INTO image_table( image_url) VALUES ("${arr}")`,
+            `INSERT INTO image_table( image_url) VALUES ("${arr}")`
           );
         });
       }
