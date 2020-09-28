@@ -28,6 +28,10 @@ import {
   createApplication,
   get_application_form,
   directorLand,
+  updateFileNumber,
+  get_file_number,
+  get_recommendation,
+  get_new_mail,
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -59,5 +63,9 @@ module.exports = (app) => {
   app.get('/api/get/letter/body/:letter', getLetterBody);
   app.get('/api/get/groundrent/:land/:range', getGroundRent);
   app.get('/api/get/unit/:department', getUnit);
-  app.get('/api/get/application/form', get_application_form);
+  app.get('/api/get/application/form/:user', get_application_form);
+  app.get('/api/get/file/number', get_file_number);
+  app.post('/api/update/file/number', updateFileNumber);
+  app.get('/api/get/recomendation/:user', get_recommendation);
+  app.get('/api/get/new/mail/:user', get_new_mail);
 };

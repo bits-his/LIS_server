@@ -329,10 +329,65 @@ export const directorLand = (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 };
 export const get_application_form = (req, res) => {
-  // console.log(req.params[0].position);
+  // let data = req.params.newFile.split(',');
+
+  // console.log(data);
   db.sequelize
-    .query(`SELECT * FROM public.application_form where status='Director Land'`)
+    .query(
+      `select * from public.application_form where forward_to='${req.params.user}' AND status in ('New File')`
+    )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
 // where status='New' and forward_to='${req.params[0].position}'
+export const get_file_number = (req, res) => {
+  // console.log(req.params[0].position);
+  db.sequelize
+    .query(
+      `select file_code,max(id)+1 as id from public.file_number where file_code in('COM','RES','IND') group by file_code  `
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
+export const updateFileNumber = (req, res) => {
+  console.log(req.body);
+  db.sequelize
+    .query(
+      `update public.file_number set id ='${req.body.code}' where file_code= '${req.body.id}' `
+    )
+    .then((results) => res.json({ success: true, results }))
+    .catch((err) => res.json({ success: false, err }));
+};
+export const get_recommendation = (req, res) => {
+  // let data = req.params.newFile.split(',');
+
+  // console.log(data);
+  db.sequelize
+    .query(
+      `select * from public.application_form where forward_to='${req.params.user}' AND status in ('Recommended')`
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+// export const get_new_file = (req, res) => {
+//   let data = req.params.newFile.split(',');
+
+//   console.log(data);
+//   db.sequelize
+//     .query(
+//       `select * from public.application_form where forward_to='${req.params.user}' AND status in ('New File)`
+//     )
+//     .then((results) => res.json({ success: true, results: results[0] }))
+//     .catch((err) => res.status(500).json({ err }));
+// };
+export const get_new_mail = (req, res) => {
+  // let data = req.params.newFile.split(',');
+  // console.log(data);
+  db.sequelize
+    .query(
+      `select * from public.application_form where forward_to='${req.params.user}' AND status in ('New Mail')`
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
