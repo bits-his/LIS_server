@@ -52,11 +52,15 @@ app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
     amount_paid,
     reciept_no,
     application,
+    email,
+    generate,
+    forward_by,
   } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO application_form(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no,status,forward_to) VALUES ('${today}','${form_no}','${application_type}','${application_name}','${amount}','${address}','${phone}','${other_Info}','${tp_no}','${land_no}','${amount_paid}','${reciept_no}','${application}','Director Land')`
+      `INSERT INTO application_form(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no,status,forward_to,email,commissioning,forward_by) VALUES
+       ('${today}','${form_no}','${application_type}','${application_name}','${amount}','${address}','${phone}','${other_Info}','${tp_no}','${land_no}','${amount_paid}','${reciept_no}','${application}','Director Land','${email}','${generate}','${forward_by}')`
     )
     .then(() => {
       if (data) {
