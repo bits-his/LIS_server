@@ -32,6 +32,8 @@ import {
   get_file_number,
   get_recommendation,
   get_new_mail,
+  updateApplication,
+  getRaiseRecomendation
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -41,6 +43,7 @@ module.exports = (app) => {
   app.post('/api/rate/charge', createRateCharge);
   app.get('/api/get/department/position', getDepartment_Position);
   app.get('/api/get/position', getPostion);
+  app.post('/api/update/application/form',updateApplication)
   app.post('/api/site_file/create', createSiteFile);
   app.post('/api/letter_template/create', createLetterTemplate);
   // app.post('/api/departmentunit/create', createDepartmentunit);
@@ -64,6 +67,7 @@ module.exports = (app) => {
   app.get('/api/get/groundrent/:land/:range', getGroundRent);
   app.get('/api/get/unit/:department', getUnit);
   app.get('/api/get/application/form/:user', get_application_form);
+  app.get('/api/get/raise/recommendation/:user',getRaiseRecomendation)
   app.get('/api/get/file/number', get_file_number);
   app.post('/api/update/file/number', updateFileNumber);
   app.get('/api/get/recomendation/:user', get_recommendation);

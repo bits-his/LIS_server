@@ -315,10 +315,11 @@ export const getDepartment_Position = (req, res) => {
 export const getPostion = (req, res) => {
   const { id } = req.params;
   db.sequelize
-    .query(`CALL get_position()`)
+    .query(`SELECT distinct position FROM public.users`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
 export const directorLand = (req, res) => {
   const { id } = req.body;
   db.sequelize
@@ -328,13 +329,33 @@ export const directorLand = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+export const updateApplication = (req, res) => {
+  const { form_no,forward } = req.body;
+  db.sequelize
+    .query(
+      `update public.application_form set status='Raise Recommendation' , forward_to='${forward}' where form_no='${form_no}' `
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
 export const get_application_form = (req, res) => {
   // let data = req.params.newFile.split(',');
 
-  // console.log(data);
+  console.log(req.params);
   db.sequelize
     .query(
       `select * from public.application_form where forward_to='${req.params.user}' AND status in ('New File')`
+    )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
+export const getRaiseRecomendation = (req, res) => {
+  // let data = req.params.newFile.split(',');
+
+  console.log(req.params);
+  db.sequelize
+    .query(
+      `select * from public.application_form where forward_to='${req.params.user}' AND status in ('Raise Recommendation')`
     )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
@@ -349,6 +370,7 @@ export const get_file_number = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
 
 export const updateFileNumber = (req, res) => {
   console.log(req.body);
