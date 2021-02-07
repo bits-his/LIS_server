@@ -5,10 +5,13 @@ import cors from 'cors';
 import models from './models';
 import { profileStorage, uploadLetter, surveyor } from '../config/multer';
 import db from './models';
+import dotenv from 'dotenv'
+
 // const cloudinary = require('cloudinary');
 const { cloudinary } = require('./util/Cloudinary');
 
 const app = express();
+dotenv.config()
 
 app.use(bodyParser.json());
 
