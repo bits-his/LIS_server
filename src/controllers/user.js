@@ -30,7 +30,7 @@ const create = (req, res) => {
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  let _id = moment().format("DDMMyyyyhhmmss");
+  let _id = Math.random() + Math.random();
   console.log(_id);
 
   // User.findAll({ where: { email } }).then((user) => {
@@ -40,7 +40,7 @@ const create = (req, res) => {
       if (user[0].length) {
         return res
           .status(400)
-          .json({ success: false, email: "Email already exists!" });
+          .json({ success: false, msg: "Email already exists!" });
       } else {
         let newUser = {
           name,
@@ -62,13 +62,13 @@ const create = (req, res) => {
             // User.create(newUser)
             db.sequelize
               .query(
-                `INSERT INTO "users" ("id","name","email","password","role","accessTo","position","department","accessToDept") VALUES ('${_id}', '${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')`
+                "INSERT INTO `users` (`id`,`name`,`email`,`password`,`role`,`accessTo`,`position`,`department`,`accessToDept`) VALUES ('${_id}', '${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')"
               )
               .then((user) => {
                 res.json({ success: true, user });
               })
               .catch((err) => {
-                res.status(500).json({ success: false, err });
+                res.status(500).json({ success: false, msg: err });
               });
           });
         });
@@ -84,8 +84,7 @@ export const verifyUserToken = (req, res) => {
     if (err) {
       return res.json({
         success: false,
-        msg: "Failed to authenticate token.",
-        err,
+        msg: "Failed to authenticate token." + err,
       });
     }
 
@@ -106,7 +105,7 @@ export const verifyUserToken = (req, res) => {
         });
       })
       .catch((err) => {
-        res.status(500).json({ success: false, err });
+        res.status(500).json({ success: false, msg: err });
         console.log(err);
       });
   });
@@ -117,7 +116,9 @@ const login = (req, res) => {
 
   // check validation
   if (!isValid) {
-    return res.status(400).json(errors);
+    return res
+      .status(400)
+      .json({ success: false, error: errors, msg: "Fields are required" });
   }
 
   const { email, password } = req.body;
@@ -134,7 +135,8 @@ const login = (req, res) => {
       console.log(user);
       //check for user
       if (!user.length) {
-        errors.email = "User not found!";
+        errors.success = false;
+        errors.msg = "User not found!";
         return res.status(404).json(errors);
       }
 
@@ -166,16 +168,16 @@ const login = (req, res) => {
               }
             );
           } else {
-            errors.password = "Password not correct";
+            errors.msg = "Password not correct";
             errors.success = false;
             console.log(errors);
             return res.status(400).json(errors);
           }
         })
-        .catch((err) => console.log(err));
+        .catch((err) => res.status(500).json({ success: false, msg: err }));
     })
     .catch((err) => {
-      res.status(500).json({ success: false, err });
+      res.status(500).json({ success: false, msg: err });
       console.log(err);
     });
 };
@@ -188,7 +190,7 @@ const findAllUsers = (req, res) => {
     .then((user) => {
       res.json({ user });
     })
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, msg: err }));
 };
 
 // fetch user by userId
@@ -221,7 +223,7 @@ const update = (req, res) => {
     { where: { id } }
   )
     .then((user) => res.status(200).json({ user }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, msg: err }));
 };
 
 // delete a user
