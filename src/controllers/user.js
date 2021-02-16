@@ -1,7 +1,5 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import passport from "passport";
-import moment from "moment";
 
 import db from "../models";
 const User = db.User;
@@ -22,7 +20,6 @@ const create = (req, res) => {
     role,
     department,
     accessToDept,
-    id,
   } = req.body;
   errors.success = false;
 
@@ -30,8 +27,6 @@ const create = (req, res) => {
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  let _id = Math.random() + Math.random();
-  console.log(_id);
 
   // User.findAll({ where: { email } }).then((user) => {
   db.sequelize
@@ -44,7 +39,6 @@ const create = (req, res) => {
       } else {
         let newUser = {
           name,
-          // username,
           role: role ? role : "",
           email,
           password,
@@ -52,20 +46,19 @@ const create = (req, res) => {
           accessTo,
           department,
           accessToDept,
-          id,
         };
-        console.log(newUser);
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;
             newUser.password = hash;
-            // User.create(newUser)
-            db.sequelize
-              .query(
-                "INSERT INTO `users` (`id`,`name`,`email`,`password`,`role`,`accessTo`,`position`,`department`,`accessToDept`) VALUES ('${_id}', '${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')"
-              )
-              .then((user) => {
-                res.json({ success: true, user });
+            User.create(newUser)
+            // db.sequelize
+            //   .query(
+            //     "INSERT INTO `users` ( `name`,`email`,`password`,`role`,`accessTo`,`position`,`department`,`accessToDept`)"+
+            //     " VALUES ('${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')"
+            //   )
+              .then((newUser) => {
+                res.json({ success: true, user:newUser });
               })
               .catch((err) => {
                 res.status(500).json({ success: false, msg: err });

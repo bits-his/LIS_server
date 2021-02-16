@@ -12,7 +12,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-let port = process.env.PORT || 8080; // set the view engine to ejs
+let port = process.env.PORT || 8000; // set the view engine to ejs
 app.set('view engine', 'ejs');
 
 // make express look in the public directory for assets (css/js/img)
@@ -72,13 +72,22 @@ app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
           arr.push(req.body.form_no);
           console.log(arr);
           db.sequelize.query(
-            `INSERT INTO image_table(id, image_url) VALUES ('${arr[1]}','${arr[0]}')`
+            `INSERT INTO image_table(id, image_url) VALUES ('${arr[0]}')`
           );
         });
       }
     })
-    .then((results) => res.json({ success: true, results }))
-    .catch((err) => res.json({ success: false, err }));
+    .then((result) =>{ 
+      db.sequelize
+      .query(
+        `UPDATE INTO application_form SET image_id=${result['id']}')`
+      ).then()
+      .catch((err) => res.json({ success: false, err }))
+
+      if (raresultw) 
+        res.json({ success: true, raw })
+    })
+    .catch((err) => res.json({ success: false, msg:err }));
 });
 
 app.post(
@@ -87,7 +96,8 @@ app.post(
   (req, res) => {
     db.sequelize
       .query(
-        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) VALUES ('${req.body.selectLetter}','${req.body.selectCC}','${req.body.remarks}')`
+        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) 
+        VALUES ('${req.body.selectLetter}','${req.body.selectCC}','${req.body.remarks}')`
       )
       .then(() => {
         const data = req.files;

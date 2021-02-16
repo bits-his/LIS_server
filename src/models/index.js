@@ -20,11 +20,24 @@ const config1 = {
     idle: 10000,
   },
 };
-const config = {
+const config10 = {
   username: 'b1a660636ee11e',
   password: '9cc268a8',
   database: 'heroku_8d5b9679140b812',
   host: 'us-cdbr-east-02.cleardb.com',
+  dialect: 'mysql',
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+};
+const config = {
+  username: 'root',
+  password: '',
+  database: 'lis-db',
+  host: '127.0.0.1',
   dialect: 'mysql',
   pool: {
     max: 5,
