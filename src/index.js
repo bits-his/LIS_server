@@ -72,7 +72,7 @@ app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
           arr.push(req.body.form_no);
           console.log(arr);
           db.sequelize.query(
-            `INSERT INTO image_table(id, image_url) VALUES ('${arr[0]}')`
+            `INSERT INTO images(id, image_url) VALUES ('${arr[0]}')`
           );
         });
       }
@@ -106,7 +106,7 @@ app.post(
             let arr = [];
             arr.push(item.path);
             db.sequelize.query(
-              `INSERT INTO image_table( image_url) VALUES ("${arr}")`
+              `INSERT INTO images( image_url) VALUES ("${arr}")`
             );
           });
         }
@@ -128,7 +128,7 @@ app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
           let arr = [];
           arr.push(item.path);
           db.sequelize.query(
-            `INSERT INTO image_table( image_url) VALUES ("${arr}")`
+            `INSERT INTO images( image_url) VALUES ("${arr}")`
           );
         });
       }
@@ -137,20 +137,20 @@ app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 });
 
-// app.post('/api/image/upload', async (req, res) => {
-//   try {
-//     const image = req.body;
-//     console.log(image)
-//     const uploadedReponse = await cloudinary.uploader.upload(`${image}`,{
-//       upload_preset:"myimage"
-//     })
-//     console.log(uploadedReponse)
-//     res.json({msg:'uploaded'})
-//   } catch (error) {
-//     console.log(error)
-//     res.status(500).json({msg:"not uploaded"})
-//   }
-// });
+app.post('/api/image/upload', async (req, res) => {
+  try {
+    const image = req.body;
+    console.log(image)
+    const uploadedReponse = await cloudinary.uploader.upload(`${image}`,{
+      upload_preset:"myimage"
+    })
+    console.log(uploadedReponse)
+    res.json({msg:'uploaded'})
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({msg:"not uploaded"})
+  }
+});
 
 //create a server
 var server = app.listen(port, function () {

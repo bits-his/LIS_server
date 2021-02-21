@@ -20,7 +20,7 @@ const config1 = {
     idle: 10000,
   },
 };
-const config10 = {
+const configlast = {
   username: 'b1a660636ee11e',
   password: '9cc268a8',
   database: 'heroku_8d5b9679140b812',
@@ -39,12 +39,12 @@ const config = {
   database: 'lis-db',
   host: '127.0.0.1',
   dialect: 'mysql',
-  pool: {
-    max: 5,
-    min: 0,
-    acquire: 30000,
-    idle: 10000,
-  },
+  // pool: {
+  //   max: 5,
+  //   min: 0,
+  //   acquire: 30000,
+  //   idle: 10000,
+  // },
 };
 const db = {};
 
@@ -79,5 +79,11 @@ Object.keys(db).forEach((modelName) => {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
+const User = db.User;
+const Role = db.Role;
+
+User.hasOne(Role);
+Role.belongsTo(User);
 
 export default db;

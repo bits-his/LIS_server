@@ -8,7 +8,8 @@ import {
   findById,
   update,
   deleteUser,
-  verifyUserToken,
+  profile,
+  getRole
 } from '../controllers/user';
 
 module.exports = (app) => {
@@ -23,7 +24,7 @@ module.exports = (app) => {
 
   // user login
   app.post('/api/users/login', login);
-  app.get('/api/user/verify', verifyUserToken);
+  app.get('/api/user/verify',passport.authenticate('jwt', { session: false }), profile);
 
   //retrieve all users
   app.get(
@@ -60,4 +61,10 @@ module.exports = (app) => {
     }),
     allowOnly(config.accessLevels.admin, deleteUser),
   );
+
+app.get(
+  '/api/user/get-postion',
+  passport.authenticate('jwt', {
+    session: false,
+  }), getRole);
 };

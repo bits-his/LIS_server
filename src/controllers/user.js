@@ -28,16 +28,18 @@ const create = (req, res) => {
     return res.status(400).json(errors);
   }
 
-  // User.findAll({ where: { email } }).then((user) => {
-  db.sequelize
-    .query(`SELECT * FROM users WHERE email='${email}'`)
+  User.findOne({ where: { email } })
+  // .then((user) => {
+  // db.sequelize
+  //   .query(`SELECT * FROM users WHERE email='${email}'`)
     .then((user) => {
-      if (user[0].length) {
+      if (user) {
         return res
           .status(400)
           .json({ success: false, msg: "Email already exists!" });
       } else {
         let newUser = {
+          id:null,
           name,
           role: role ? role : "",
           email,
@@ -69,7 +71,7 @@ const create = (req, res) => {
     });
 };
 
-export const verifyUserToken = (req, res) => {
+export const verifyUserToken = (req, res, next) => {
   const authToken = req.headers["authorization"];
   const token = authToken.split(" ")[1];
   // console.log(token)
@@ -79,24 +81,21 @@ export const verifyUserToken = (req, res) => {
         success: false,
         msg: "Failed to authenticate token." + err,
       });
+    
     }
 
     const { id } = decoded;
-
-    // User.findAll({ where: { id } })
-    db.sequelize
-      .query(`SELECT * FROM users WHERE id='${id}'`)
-      .then((found) => {
-        let user = found[0];
-        if (!user.length) {
-          return res.json({ msg: "user not found" });
-        }
-
-        res.json({
-          success: true,
-          user: user[0],
-        });
-      })
+    
+    User.findOne({ where: { id } })
+  
+    .then((user)=>{
+      //   res.json({
+      //     success: true,
+      //     user,
+      //   });
+      // 
+      next()
+    })
       .catch((err) => {
         res.status(500).json({ success: false, msg: err });
         console.log(err);
@@ -142,8 +141,8 @@ const login = (req, res) => {
           if (isMatch) {
             // user matched
             console.log("matched!");
-            const { id, username } = user[0];
-            const payload = { id, username }; //jwt payload
+            const { id, role, role_id } = user[0];
+            const payload = {id, role, role_id }; //jwt payload
             // console.log(payload)
 
             jwt.sign(
@@ -157,6 +156,7 @@ const login = (req, res) => {
                   success: true,
                   token: "Bearer " + token,
                   role: user[0].role,
+                  role_id: user[0].role_id,
                 });
               }
             );
@@ -175,6 +175,20 @@ const login = (req, res) => {
     });
 };
 
+// profile
+const profile = (req, res) => {
+  User.findOne({ where: { id:req.user.id } })
+  .then((user)=>{
+      res.json({
+        success: true,
+        user,
+      });
+  })
+    .catch((err) => {
+      res.status(500).json({ success: false, msg: err });
+      console.log(err);
+    });
+}
 // fetch all users
 const findAllUsers = (req, res) => {
   // User.findAll()
@@ -227,5 +241,12 @@ const deleteUser = (req, res) => {
     .then(() => res.status.json({ msg: "User has been deleted successfully!" }))
     .catch((err) => res.status(500).json({ msg: "Failed to delete!" }));
 };
+export const getRole = (req, res) => {
+  const { id } = req.user.id;
+  db.sequelize
+    .query(`CALL get_position()`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+};
 
-export { create, login, findAllUsers, findById, update, deleteUser };
+export { create, login, findAllUsers, findById, update, deleteUser, profile };

@@ -1,3 +1,5 @@
+import passport from 'passport';
+const veryfyJwt = passport.authenticate('jwt', { session: false });
 import {
   createRegistory,
   createSiteFile,
@@ -23,24 +25,31 @@ import {
   getImageRemark,
   createUser,
   getDepartment_Position,
-  getPostion,
+  getRoles,
   getUnit,
   createApplication,
-  get_application_form,
+  getForwardToDirector,
   directorLand,
   updateFileNumber,
   get_file_number,
   get_recommendation,
   get_new_mail,
+  getNewFiles,
+  getAppPreview,
+  psApplication,
 } from '../controllers/Director';
+import {
+  verifyUserToken
+} from '../controllers/user';
 
 module.exports = (app) => {
   app.post('/api/registory/create', createRegistory);
+  app.get('/api/get/forward-to/me', veryfyJwt, getNewFiles);
   app.get('/api/use/rate/cat', getUseRateCat);
   app.get('/api/get/review/range', getReviewRange);
   app.post('/api/rate/charge', createRateCharge);
   app.get('/api/get/department/position', getDepartment_Position);
-  app.get('/api/get/position', getPostion);
+  app.get('/api/get/roles', veryfyJwt,  getRoles);
   app.post('/api/site_file/create', createSiteFile);
   app.post('/api/letter_template/create', createLetterTemplate);
   // app.post('/api/departmentunit/create', createDepartmentunit);
@@ -63,9 +72,11 @@ module.exports = (app) => {
   app.get('/api/get/letter/body/:letter', getLetterBody);
   app.get('/api/get/groundrent/:land/:range', getGroundRent);
   app.get('/api/get/unit/:department', getUnit);
-  app.get('/api/get/application/form/:user', get_application_form);
   app.get('/api/get/file/number', get_file_number);
   app.post('/api/update/file/number', updateFileNumber);
   app.get('/api/get/recomendation/:user', get_recommendation);
   app.get('/api/get/new/mail/:user', get_new_mail);
+  app.post('/api/ps/application', psApplication);  
+  app.get('/api/application/preview/:id', getAppPreview);
+  
 };

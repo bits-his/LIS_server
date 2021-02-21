@@ -1,11 +1,13 @@
 import db from "../models";
+const Application = db.Application
+const Role = db.Role
 
 export const createRegistory = (req, res) => {
   const { acknowlegment_id, today, tag, remark, forwardTo, from } = req.body;
   // console.log(data);
   db.sequelize
     .query(
-      `INSERT INTO registry(Acknolegment_id,registry_date,tag_no,remarks,file_from,file_to) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}","${from}","${forwardTo}")`
+      `INSERT INTO applications(Acknolegment_id,application_date,tag_no,remarks,file_from,forward_to) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}","${from}","${forwardTo}")`
     )
     .then(() => {
       db.sequelize.query(
@@ -163,7 +165,7 @@ export const createApplication = (req, res) => {
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO application_form(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no,status) VALUES ('${today}','${form_no}','${application_type}','${application_name}','${amount}','${address}','${phone}','${other_Info}','${tp_no}','${land_no}','${amount_paid}','${reciept_no}','${application}')`
+      `INSERT INTO applications(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no,status) VALUES ('${today}','${form_no}','${application_type}','${application_name}','${amount}','${address}','${phone}','${other_Info}','${tp_no}','${land_no}','${amount_paid}','${reciept_no}','${application}')`
     )
     .then((results) => {
       res.json({ results });
@@ -191,7 +193,7 @@ export const getUnit = (req, res) => {
 export const getRegistry = (req, res) => {
   db.sequelize
     .query(
-      'SELECT Acknolegment_id,registry_date,tag_no,remarks,inserted_by FROM registry where file_to="PS Secretary"'
+      'SELECT Acknolegment_id,applications_date,tag_no,remarks,inserted_by FROM applications where forward_to="PS Secretary"'
     )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
@@ -216,7 +218,7 @@ export const getDepartmentUnit = (req, res) => {
 export const generatedId = (req, res) => {
   db.sequelize
     .query(
-      "SELECT CONCAT(IFNULL(MAX(id), 0) + 1) AS acknowlegment FROM registry"
+      "SELECT CONCAT(IFNULL(MAX(id), 0) + 1) AS acknowlegment FROM applications"
     )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
@@ -226,7 +228,7 @@ export const updateRegistry = (req, res) => {
   console.log(req.body);
   db.sequelize
     .query(
-      `UPDATE registry set file_to="${req.body.ps}" where tag_no="${req.body.tagNo}"`
+      `UPDATE applications set forward_to="${req.body.ps}" where tag_no="${req.body.tagNo}"`
     )
     .then(() => {
       db.sequelize.query(
@@ -239,16 +241,34 @@ export const updateRegistry = (req, res) => {
 
 export const getMailBadge = (req, res) => {
   db.sequelize
-    .query('SELECT COUNT(file_to) as Ps FROM registry  WHERE file_to="Ps"')
+    .query('SELECT COUNT(forward_to) as Ps FROM applications  WHERE forward_to="Ps"')
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
 export const getMailTable = (req, res) => {
   db.sequelize
-    .query('SELECT * FROM registry  WHERE file_to="Ps"')
+    .query('SELECT * FROM applications  WHERE forward_to="Ps"')
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
+export const getNewFiles = (req, res) => {
+  let user = req.user
+  
+  Application.findAll({where:{ forward_to:user.role}})
+  .then(files=>{
+    res.json({ success: true, data: files })
+  })
+  .catch((err) => res.status(500).json({ err }));
+}
+
+export const getAppPreview = (req, res) => {
+  Application.findOne({where:{ id:req.params.id}})
+  .then(files=>{
+    res.json({ success: true, data: files })
+  })
+  .catch((err) => res.status(500).json({ err }));
+}
 
 export const getLetterTemplateName = (req, res) => {
   db.sequelize
@@ -293,7 +313,7 @@ export const getReviewRange = (req, res) => {
 export const getImagesURL = (req, res) => {
   const { id } = req.params;
   db.sequelize
-    .query(`SELECT image_url FROM image_table WHERE id="${id}"`)
+    .query(`SELECT image_url FROM images WHERE id="${id}"`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
@@ -304,6 +324,7 @@ export const getImageRemark = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
+
 export const getDepartment_Position = (req, res) => {
   const { id } = req.params;
   db.sequelize
@@ -312,32 +333,32 @@ export const getDepartment_Position = (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 };
 
-export const getPostion = (req, res) => {
-  const { id } = req.params;
+export const getRoles = (req, res) => {
+  // const { id } = req.user.id;
   db.sequelize
-    .query(`CALL get_position()`)
-    .then((results) => res.json({ success: true, results: results[0] }))
+    .query("SELECT id, title AS role FROM `roles` where title!=''")
+    .then((results) => {
+      console.log(results[0])
+      res.json({ success: true, data: results[0] })})
     .catch((err) => res.status(500).json({ err }));
 };
 export const directorLand = (req, res) => {
   const { id } = req.body;
   db.sequelize
     .query(
-      `update application_form set status='Director Land' where file_no='${id}' `
+      `update applications set status='Director Land' where file_no='${id}' `
     )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
-export const get_application_form = (req, res) => {
-  // let data = req.params.newFile.split(',');
-
-  // console.log(data);
+export const getForwardToDirector = (req, res) => {
+  
   db.sequelize
     .query(
-      `select * from application_form where forward_to='${req.params.user}' AND status in ('New File')`
+      `select * from applications WHERE  forward_to='Director'`
     )
-    .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .then((results) => res.json({ success: true, data: results }))
+    .catch((err) => res.status(500).json({   success: false, error:err}));
 };
 // where status='New' and forward_to='${req.params[0].position}'
 export const get_file_number = (req, res) => {
@@ -365,7 +386,7 @@ export const get_recommendation = (req, res) => {
   // console.log(data);
   db.sequelize
     .query(
-      `select * from application_form where forward_to='${req.params.user}' AND status in ('Recommended')`
+      `select * from applications where forward_to='${req.params.user}' AND status in ('Recommended')`
     )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
@@ -376,7 +397,7 @@ export const get_recommendation = (req, res) => {
 //   console.log(data);
 //   db.sequelize
 //     .query(
-//       `select * from application_form where forward_to='${req.params.user}' AND status in ('New File)`
+//       `select * from applications where forward_to='${req.params.user}' AND status in ('New File)`
 //     )
 //     .then((results) => res.json({ success: true, results: results[0] }))
 //     .catch((err) => res.status(500).json({ err }));
@@ -386,8 +407,22 @@ export const get_new_mail = (req, res) => {
   // console.log(data);
   db.sequelize
     .query(
-      `select * from application_form where forward_to='${req.params.user}' AND status in ('New Mail')`
+      `select * from applications where forward_by='${req.params.user}' AND status in ('New Mail')`
     )
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ err }));
+}
+
+export const psApplication = (req, res) => {
+  const {
+    forward_to,
+    forward_by,
+    remark,
+    stage,
+    id,
+  } = req.body;
+      db.sequelize.query( `UPDATE applications SET forward_to='${forward_to}',
+      forward_by='${forward_by}', remark='${remark}', stage=${stage} WHERE id=${id}`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
