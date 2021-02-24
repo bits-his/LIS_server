@@ -1,7 +1,7 @@
 import passport from 'passport';
 const veryfyJwt = passport.authenticate('jwt', { session: false });
 import {
-  createRegistory,
+  createRegistry,
   createSiteFile,
   createLetterTemplate,
   createDepartmentunit,
@@ -27,14 +27,13 @@ import {
   getDepartment_Position,
   getRoles,
   getUnit,
-  createApplication,
   getForwardToDirector,
   directorLand,
   updateFileNumber,
   get_file_number,
   get_recommendation,
   get_new_mail,
-  getNewFiles,
+  forwardToMe,
   getAppPreview,
   psApplication,
 } from '../controllers/Director';
@@ -43,8 +42,8 @@ import {
 } from '../controllers/user';
 
 module.exports = (app) => {
-  app.post('/api/registory/create', createRegistory);
-  app.get('/api/get/forward-to/me', veryfyJwt, getNewFiles);
+  app.post('/api/registory/create', createRegistry);
+  app.get('/api/get/forward-to/me', veryfyJwt, forwardToMe);
   app.get('/api/use/rate/cat', getUseRateCat);
   app.get('/api/get/review/range', getReviewRange);
   app.post('/api/rate/charge', createRateCharge);
@@ -55,12 +54,11 @@ module.exports = (app) => {
   // app.post('/api/departmentunit/create', createDepartmentunit);
   app.post('/api/department/create', createDepartment);
   app.post('/api/directors/create', createDirectors);
-  app.post('/api/application/create', createApplication);
   app.post('/api/create/user', createUser);
   app.get('/api/get/department', getDepartment);
-  app.get('/api/get/registry', getRegistry);
+  app.get('/api/get/registry', veryfyJwt, getRegistry);
   app.get('/api/get/mail/table', getMailTable);
-  app.get('/api/get/remarks/:tag_no', getRemarks);
+  app.get('/api/get/remarks/:id', veryfyJwt, getRemarks);
   app.get('/api/get/images/URL/:id', getImagesURL);
   app.get('/api/get/imageRemark/:id', getImageRemark);
   app.get('/api/get/department_unit', getDepartmentUnit);

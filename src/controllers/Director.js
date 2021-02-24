@@ -1,21 +1,47 @@
 import db from "../models";
 const Application = db.Application
 const Role = db.Role
+const Remark = db.Remark
 
-export const createRegistory = (req, res) => {
-  const { acknowlegment_id, today, tag, remark, forwardTo, from } = req.body;
-  // console.log(data);
-  db.sequelize
-    .query(
-      `INSERT INTO applications(Acknolegment_id,application_date,tag_no,remarks,file_from,forward_to) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}","${from}","${forwardTo}")`
-    )
-    .then(() => {
-      db.sequelize.query(
-        `INSERT INTO remarks(remarks_id,date_of_remarks,tag_no,remarks) VALUES ("${acknowlegment_id}","${today}","${tag}","${remark}")`
-      );
+export const createRegistry = (req, res) => {
+  const { 
+    acknowlegment_id,
+    application_date,
+    application_type,
+    name,
+    amount,
+    address,
+    email,
+    phone,
+    other_info,
+    tp_no,
+    plot_no,
+    amount_paid,
+    reciept_no,
+    forward_to,
+    forward_by,
+    status, } = req.body;
+
+    Application.create({
+      acknowlegment_id,
+      application_date,
+      application_type,
+      name,
+      amount,
+      address,
+      email,
+      phone,
+      other_info,
+      tp_no,
+      plot_no,
+      amount_paid,
+      reciept_no,
+      forward_to,
+      forward_by,
+      status, 
     })
-    .then((results) => res.json({ success: true, results }))
-    .catch((err) => res.json({ success: false, err }));
+    .then((application) => res.json({ success: true, data:application }))
+    .catch((err) => res.status(500).json({ success: false, msg:err }));
 };
 
 export const createSiteFile = (req, res) => {
@@ -146,36 +172,6 @@ export const createDirectors = (req, res) => {
     });
 };
 
-export const createApplication = (req, res) => {
-  const {
-    today,
-    form_no,
-    application_type,
-    application_name,
-    amount,
-    address,
-    phone,
-    other_Info,
-    tp_no,
-    land_no,
-    amount_paid,
-    reciept_no,
-    application,
-  } = req.body;
-  console.log(req.body);
-  db.sequelize
-    .query(
-      `INSERT INTO applications(application_date,form_no,type,name,amount,address,phone,other_info,tp_no,file_no,amount_paid,reciept_no,status) VALUES ('${today}','${form_no}','${application_type}','${application_name}','${amount}','${address}','${phone}','${other_Info}','${tp_no}','${land_no}','${amount_paid}','${reciept_no}','${application}')`
-    )
-    .then((results) => {
-      res.json({ results });
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(500).json({ err });
-    });
-};
-
 export const getDepartment = (req, res) => {
   db.sequelize
     .query("SELECT department_code FROM department")
@@ -191,20 +187,35 @@ export const getUnit = (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 };
 export const getRegistry = (req, res) => {
-  db.sequelize
-    .query(
-      'SELECT Acknolegment_id,applications_date,tag_no,remarks,inserted_by FROM applications where forward_to="PS Secretary"'
-    )
-    .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+  Application.findAll({
+    where:{forward_to:req.user.role},
+    include:[{
+      model: Remark,
+      as: 'Remarks',
+      wehere:{
+        application_id:Application.id
+      },
+      required: false
+    }],
+    limit:10   
+  })
+  .then((results) => res.json({ success: true, results}))
+  .catch((error) => res.status(500).json({ success: false, error }));
 };
 
 export const getRemarks = (req, res) => {
-  const { tag_no } = req.params;
-  db.sequelize
-    .query(`SELECT remarks FROM remarks WHERE tag_no="${tag_no}" order by id`)
-    .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+  const { id } = req.params;
+    Application.findOne({where:{id},
+      include:[{
+        model: Remark,
+        as: 'Remarks',
+        wehere:{
+          application_id:Application.id
+        },
+        required: false
+      }]})
+    .then((results) => res.json({ success: true, results }))
+    .catch((error) => res.status(500).json({ success: false, error }));
 };
 
 export const getDepartmentUnit = (req, res) => {
@@ -252,14 +263,14 @@ export const getMailTable = (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 };
 
-export const getNewFiles = (req, res) => {
+export const forwardToMe = (req, res) => {
   let user = req.user
   
-  Application.findAll({where:{ forward_to:user.role}})
-  .then(files=>{
-    res.json({ success: true, data: files })
+  Application.findAll({where:{ forward_to:user.role, status:'New File'}})
+  .then(data=>{
+    res.json({ success: true, data })
   })
-  .catch((err) => res.status(500).json({ err }));
+  .catch((err) => res.status(500).json({  success: false, msg: err }));
 }
 
 export const getAppPreview = (req, res) => {
@@ -418,11 +429,20 @@ export const psApplication = (req, res) => {
     forward_to,
     forward_by,
     remark,
-    stage,
     id,
   } = req.body;
       db.sequelize.query( `UPDATE applications SET forward_to='${forward_to}',
-      forward_by='${forward_by}', remark='${remark}', stage=${stage} WHERE id=${id}`)
-    .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+      forward_by='${forward_by}', remark='${remark}', } WHERE id=${id}`)
+    .then((results) => {
+      Remark.create({
+        remark_to,
+        remark_by,
+        remark,
+        application_id:id,
+      })
+      .then()
+      .catch((err) => res.status(500).json({ status:false, msg: err }));
+      res.json({ success: true, results: results[0] })
+    })
+  .catch((err) => res.status(500).json({  status:false, msg: err }));
 };

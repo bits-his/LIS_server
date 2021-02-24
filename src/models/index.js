@@ -80,10 +80,17 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-const User = db.User;
-const Role = db.Role;
+const {
+  User, 
+  Role, 
+  Application,
+  Remark
+  } = db;
 
 User.hasOne(Role);
 Role.belongsTo(User);
+
+Application.hasMany(Remark);
+Remark.belongsTo(Application);
 
 export default db;
