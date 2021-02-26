@@ -1,6 +1,6 @@
 export default (sequelize, DataTypes) => {
     const Application = sequelize.define('Application', {
-        acknowlegment_id	: DataTypes.STRING,
+        ack_id	: DataTypes.STRING,
         name: DataTypes.STRING,
         application_date: DataTypes.STRING,
         application_type	: DataTypes.STRING,

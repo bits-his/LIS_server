@@ -5,7 +5,7 @@ const Remark = db.Remark
 
 export const createRegistry = (req, res) => {
   const { 
-    acknowlegment_id,
+    ack_id,
     application_date,
     application_type,
     name,
@@ -23,7 +23,7 @@ export const createRegistry = (req, res) => {
     status, } = req.body;
 
     Application.create({
-      acknowlegment_id,
+      ack_id,
       application_date,
       application_type,
       name,
@@ -52,7 +52,7 @@ export const createSiteFile = (req, res) => {
       `INSERT INTO sit_file(sit_file_date,sit_no,purpose,type,remarks) VALUES ("${date}","${sitNo}","${purpose}","${type}","${remarks}")`
     )
     .then((results) => res.json({ success: true }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const createUser = (req, res) => {
   const {
@@ -69,10 +69,10 @@ export const createUser = (req, res) => {
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO users(department,position, lastname, role, accessTo, username, email, password) VALUES ("${department}","${position}","${lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
+      `INSERT INTO users(department,position, name, role, accessTo, username, email, password) VALUES ("${department}","${position}","${firstname+' '+lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
     )
     .then((results) => res.json({ success: true }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const createLetterTemplate = (req, res) => {
   const {
@@ -91,7 +91,7 @@ export const createLetterTemplate = (req, res) => {
     .then((results) => {
       res.json({ results });
     })
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const createRateCharge = (req, res) => {
@@ -103,7 +103,7 @@ export const createRateCharge = (req, res) => {
     .then((results) => {
       res.json({ results });
     })
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const createDepartment = (req, res) => {
@@ -176,7 +176,7 @@ export const getDepartment = (req, res) => {
   db.sequelize
     .query("SELECT department_code FROM department")
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getUnit = (req, res) => {
   db.sequelize
@@ -184,7 +184,7 @@ export const getUnit = (req, res) => {
       `SELECT unit_name FROM departments_units where department_code='${req.params.department}'`
     )
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getRegistry = (req, res) => {
   Application.findAll({
@@ -193,7 +193,7 @@ export const getRegistry = (req, res) => {
       model: Remark,
       as: 'Remarks',
       wehere:{
-        application_id:Application.id
+        applicationId:Application.id
       },
       required: false
     }],
@@ -210,7 +210,7 @@ export const getRemarks = (req, res) => {
         model: Remark,
         as: 'Remarks',
         wehere:{
-          application_id:Application.id
+          applicationId:Application.id
         },
         required: false
       }]})
@@ -223,7 +223,7 @@ export const getDepartmentUnit = (req, res) => {
   db.sequelize
     .query("SELECT * FROM departments_units")
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const generatedId = (req, res) => {
@@ -232,7 +232,7 @@ export const generatedId = (req, res) => {
       "SELECT CONCAT(IFNULL(MAX(id), 0) + 1) AS acknowlegment FROM applications"
     )
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const updateRegistry = (req, res) => {
@@ -247,20 +247,20 @@ export const updateRegistry = (req, res) => {
       );
     })
     .then((results) => res.json({ success: true, results }))
-    .catch((err) => res.json({ success: false, err }));
+    .catch((err) => res.json({ success: false, error:err }));
 };
 
 export const getMailBadge = (req, res) => {
   db.sequelize
     .query('SELECT COUNT(forward_to) as Ps FROM applications  WHERE forward_to="Ps"')
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getMailTable = (req, res) => {
   db.sequelize
     .query('SELECT * FROM applications  WHERE forward_to="Ps"')
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const forwardToMe = (req, res) => {
@@ -278,14 +278,14 @@ export const getAppPreview = (req, res) => {
   .then(files=>{
     res.json({ success: true, data: files })
   })
-  .catch((err) => res.status(500).json({ err }));
+  .catch((err) => res.status(500).json({ success: false, error:err }));
 }
 
 export const getLetterTemplateName = (req, res) => {
   db.sequelize
     .query(`SELECT name FROM letter_template`)
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const getLetterBody = (req, res) => {
@@ -293,7 +293,7 @@ export const getLetterBody = (req, res) => {
   db.sequelize
     .query(`SELECT letter_body FROM letter_template where name="${letter}"`)
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getGroundRent = (req, res) => {
   const { land, range } = req.params;
@@ -305,20 +305,20 @@ export const getGroundRent = (req, res) => {
       },
     })
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const getUseRateCat = (req, res) => {
   db.sequelize
     .query(`SELECT DISTINCT land_use_rate_cat FROM ground_rent`)
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getReviewRange = (req, res) => {
   db.sequelize
     .query(`SELECT DISTINCT review_range FROM ground_rent`)
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const getImagesURL = (req, res) => {
@@ -326,14 +326,14 @@ export const getImagesURL = (req, res) => {
   db.sequelize
     .query(`SELECT image_url FROM images WHERE id="${id}"`)
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getImageRemark = (req, res) => {
   const { id } = req.params;
   db.sequelize
     .query(`SELECT remarks FROM remarks WHERE tag_no="${id}"`)
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const getDepartment_Position = (req, res) => {
@@ -341,17 +341,17 @@ export const getDepartment_Position = (req, res) => {
   db.sequelize
     .query(`call get_department_position()`)
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const getRoles = (req, res) => {
   // const { id } = req.user.id;
   db.sequelize
-    .query("SELECT id, title AS role FROM `roles` where title!=''")
+    .query("SELECT role FROM  `users` WHERE role !=''" )
     .then((results) => {
       console.log(results[0])
       res.json({ success: true, data: results[0] })})
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const directorLand = (req, res) => {
   const { id } = req.body;
@@ -360,7 +360,7 @@ export const directorLand = (req, res) => {
       `update applications set status='Director Land' where file_no='${id}' `
     )
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getForwardToDirector = (req, res) => {
   
@@ -379,7 +379,7 @@ export const get_file_number = (req, res) => {
       `select file_code,max(id)+1 as id from file_number where file_code in('COM','RES','IND') group by file_code  `
     )
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 
 export const updateFileNumber = (req, res) => {
@@ -400,7 +400,7 @@ export const get_recommendation = (req, res) => {
       `select * from applications where forward_to='${req.params.user}' AND status in ('Recommended')`
     )
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 // export const get_new_file = (req, res) => {
 //   let data = req.params.newFile.split(',');
@@ -411,7 +411,7 @@ export const get_recommendation = (req, res) => {
 //       `select * from applications where forward_to='${req.params.user}' AND status in ('New File)`
 //     )
 //     .then((results) => res.json({ success: true, results: results[0] }))
-//     .catch((err) => res.status(500).json({ err }));
+//     .catch((err) => res.status(500).json({ success: false, error:err }));
 // };
 export const get_new_mail = (req, res) => {
   // let data = req.params.newFile.split(',');
@@ -421,7 +421,7 @@ export const get_new_mail = (req, res) => {
       `select * from applications where forward_by='${req.params.user}' AND status in ('New Mail')`
     )
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((err) => res.status(500).json({ err }));
+    .catch((err) => res.status(500).json({ success: false, error:err }));
 }
 
 export const psApplication = (req, res) => {
@@ -429,20 +429,42 @@ export const psApplication = (req, res) => {
     forward_to,
     forward_by,
     remark,
-    id,
+    applicationId,
   } = req.body;
       db.sequelize.query( `UPDATE applications SET forward_to='${forward_to}',
-      forward_by='${forward_by}', remark='${remark}', } WHERE id=${id}`)
-    .then((results) => {
-      Remark.create({
-        remark_to,
-        remark_by,
-        remark,
-        application_id:id,
-      })
-      .then()
-      .catch((err) => res.status(500).json({ status:false, msg: err }));
-      res.json({ success: true, results: results[0] })
+      forward_by='${forward_by}', remark='${remark}' WHERE id=${applicationId}`)
+    .then(() => {
+      
+      //res.json({ success: true, msg:'data inserted'})
     })
-  .catch((err) => res.status(500).json({  status:false, msg: err }));
+  .catch((error) => res.status(500).json({  status:false, error }));
+
+  Remark.findOne({
+    where:{applicationId, remark_by: forward_by}
+  }).then((data)=>{
+    if(data && data.remark_to==forward_to){
+      data.update({
+        remark_to:forward_to,
+        remark_by:forward_by,
+        remark
+      })
+      .then((data)=>{ res.json({ status:true, data  })})
+      .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in updating remark'})});
+    }else{
+      Remark.create({
+        remark_to:forward_to,
+        remark_by:forward_by,
+        remark,
+        applicationId
+      })
+      // db.sequelize.query( `INSERT INTO remarks remark_to='${forward_to}, remark_by='${forward_by}', applicationId='${applicationId}' `)
+    .then((data)=>{ res.json({ status:true, data  })})
+      .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in creating remark'})});
+    
+    }
+  }) 
+  // .then((data)=>{ res.json({ status:true, data  })})
+    
+  .catch((error) => { res.status(500).json({ status:false, error })});
+
 };

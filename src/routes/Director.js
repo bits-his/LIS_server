@@ -48,7 +48,7 @@ module.exports = (app) => {
   app.get('/api/get/review/range', getReviewRange);
   app.post('/api/rate/charge', createRateCharge);
   app.get('/api/get/department/position', getDepartment_Position);
-  app.get('/api/get/roles', veryfyJwt,  getRoles);
+  app.get('/api/get-roles', veryfyJwt,  getRoles);
   app.post('/api/site_file/create', createSiteFile);
   app.post('/api/letter_template/create', createLetterTemplate);
   // app.post('/api/departmentunit/create', createDepartmentunit);

@@ -1,11 +1,11 @@
 export default (sequelize, DataTypes) => {
     const Role = sequelize.define('Remark', {
-      application_id:DataTypes.STRING ,
+      applicationId:DataTypes.INTEGER ,
       tag_no:DataTypes.STRING,
       remark: DataTypes.STRING,
+      remark_to: DataTypes.STRING,
+      remark_by: DataTypes.STRING,
       status: DataTypes.BOOLEAN,
-      createdAt: DataTypes.STRING,
-      updatedAt: DataTypes.STRING,
     }, {timeStamps:false});
     
     return Role;
