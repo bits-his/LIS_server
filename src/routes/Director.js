@@ -35,11 +35,8 @@ import {
   get_new_mail,
   forwardToMe,
   getAppPreview,
-  psApplication,
+  getRegistryOption
 } from '../controllers/Director';
-import {
-  verifyUserToken
-} from '../controllers/user';
 
 module.exports = (app) => {
   app.post('/api/registory/create', createRegistry);
@@ -54,18 +51,18 @@ module.exports = (app) => {
   // app.post('/api/departmentunit/create', createDepartmentunit);
   app.post('/api/department/create', createDepartment);
   app.post('/api/directors/create', createDirectors);
-  app.post('/api/create/user', createUser);
   app.get('/api/get/department', getDepartment);
   app.get('/api/get/registry', veryfyJwt, getRegistry);
+  app.get('/api/get/registries/:option', veryfyJwt, getRegistryOption);
   app.get('/api/get/mail/table', getMailTable);
   app.get('/api/get/remarks/:id', veryfyJwt, getRemarks);
   app.get('/api/get/images/URL/:id', getImagesURL);
   app.get('/api/get/imageRemark/:id', getImageRemark);
   app.get('/api/get/department_unit', getDepartmentUnit);
   app.get('/api/generated_id', generatedId);
-  app.post('/api/update/registry', updateRegistry);
+  app.post('/api/update/registry', veryfyJwt, updateRegistry);
   app.post('/api/director/land', directorLand);
-  app.get('/api/get/mail/badge', getMailBadge);
+  app.get('/api/get/mail/badge',veryfyJwt, getMailBadge);
   app.get('/api/get/letter/template/name', getLetterTemplateName);
   app.get('/api/get/letter/body/:letter', getLetterBody);
   app.get('/api/get/groundrent/:land/:range', getGroundRent);
@@ -73,8 +70,7 @@ module.exports = (app) => {
   app.get('/api/get/file/number', get_file_number);
   app.post('/api/update/file/number', updateFileNumber);
   app.get('/api/get/recomendation/:user', get_recommendation);
-  app.get('/api/get/new/mail/:user', get_new_mail);
-  app.post('/api/ps/application', psApplication);  
+  app.get('/api/get/new/mail/:user', get_new_mail);  
   app.get('/api/application/preview/:id', getAppPreview);
   
 };

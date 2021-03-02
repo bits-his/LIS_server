@@ -9,7 +9,8 @@ import {
   update,
   deleteUser,
   profile,
-  getRole
+  getRole,
+  createUser
 } from '../controllers/user';
 
 module.exports = (app) => {
@@ -67,4 +68,9 @@ app.get(
   passport.authenticate('jwt', {
     session: false,
   }), getRole);
+  
+  app.post('/api/create/user',passport.authenticate('jwt', {
+    session: false,
+  }), createUser);
 };
+

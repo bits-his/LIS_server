@@ -54,26 +54,7 @@ export const createSiteFile = (req, res) => {
     .then((results) => res.json({ success: true }))
     .catch((err) => res.status(500).json({ success: false, error:err }));
 };
-export const createUser = (req, res) => {
-  const {
-    firstname,
-    lastname,
-    username,
-    email,
-    password,
-    role,
-    accessTo,
-    department,
-    position,
-  } = req.body;
-  console.log(req.body);
-  db.sequelize
-    .query(
-      `INSERT INTO users(department,position, name, role, accessTo, username, email, password) VALUES ("${department}","${position}","${firstname+' '+lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
-    )
-    .then((results) => res.json({ success: true }))
-    .catch((err) => res.status(500).json({ success: false, error:err }));
-};
+
 export const createLetterTemplate = (req, res) => {
   const {
     today,
@@ -187,6 +168,7 @@ export const getUnit = (req, res) => {
     .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getRegistry = (req, res) => {
+
   Application.findAll({
     where:{forward_to:req.user.role},
     include:[{
@@ -202,7 +184,27 @@ export const getRegistry = (req, res) => {
   .then((results) => res.json({ success: true, results}))
   .catch((error) => res.status(500).json({ success: false, error }));
 };
-
+export const getRegistryOption = (req, res) => {
+  const option = req.params.option
+  let status = 'New File'
+  if(option!==''){
+    status = option
+  }
+  Application.findAll({
+    where:{forward_by:req.user.role, status},
+    include:[{
+      model: Remark,
+      as: 'Remarks',
+      wehere:{
+        applicationId:Application.id
+      },
+      required: false
+    }],
+    limit:10   
+  })
+  .then((results) => res.json({ success: true, results}))
+  .catch((error) => res.status(500).json({ success: false, error }));
+};
 export const getRemarks = (req, res) => {
   const { id } = req.params;
     Application.findOne({where:{id},
@@ -236,24 +238,67 @@ export const generatedId = (req, res) => {
 };
 
 export const updateRegistry = (req, res) => {
-  console.log(req.body);
-  db.sequelize
-    .query(
-      `UPDATE applications set forward_to="${req.body.ps}" where tag_no="${req.body.tagNo}"`
-    )
-    .then(() => {
-      db.sequelize.query(
-        `INSERT INTO remarks(tag_no, remarks) VALUES ("${req.body.tagNo}","${req.body.remark}")`
-      );
+//   console.log(req.body);
+//   db.sequelize
+//     .query(
+//       `UPDATE applications set forward_to='${req.body.ps}' where tag_no='${req.body.tagNo}'`
+//     )
+//     .then(() => {
+//       db.sequelize.query(
+//         `INSERT INTO remarks (tag_no, remarks) VALUES ("${req.body.tagNo}","${req.body.remark}")`
+//       );
+//     })
+//     .then((results) => res.json({ success: true, results }))
+//     .catch((err) => res.json({ success: false, error:err }));
+// };
+const {
+  forward_to,
+  forward_by,
+  remark,
+  applicationId,
+} = req.body;
+    db.sequelize.query( `UPDATE applications SET forward_to='${forward_to}',
+    forward_by='${forward_by}', status='Treated', remark='${remark}' WHERE id=${applicationId}`)
+  .then(() => {
+    
+    //res.json({ success: true, msg:'data inserted'})
+  })
+.catch((error) => res.status(500).json({  status:false, error }));
+
+Remark.findOne({
+  where:{applicationId, remark_by: forward_by}
+}).then((data)=>{
+  if(data && data.remark_to==forward_to){
+    data.update({
+      remark_to:forward_to,
+      remark_by:forward_by,
+      remark
     })
-    .then((results) => res.json({ success: true, results }))
-    .catch((err) => res.json({ success: false, error:err }));
+    .then((data)=>{ res.json({ status:true, data  })})
+    .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in updating remark'})});
+  }else{
+    Remark.create({
+      remark_to:forward_to,
+      remark_by:forward_by,
+      remark,
+      applicationId
+    })
+    // db.sequelize.query( `INSERT INTO remarks remark_to='${forward_to}, remark_by='${forward_by}', applicationId='${applicationId}' `)
+  .then((data)=>{ res.json({ status:true, data  })})
+    .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in creating remark'})});
+  
+  }
+}) 
+// .then((data)=>{ res.json({ status:true, data  })})
+  
+.catch((error) => { res.status(500).json({ status:false, error })});
+
 };
 
 export const getMailBadge = (req, res) => {
   db.sequelize
-    .query('SELECT COUNT(forward_to) as Ps FROM applications  WHERE forward_to="Ps"')
-    .then((results) => res.json({ success: true, results: results[0] }))
+    .query(`SELECT COUNT(forward_to) as badges FROM applications  WHERE forward_to='${req.user.role}'`)
+    .then((results) => res.json({ success: true, data: results[0][0]}))
     .catch((err) => res.status(500).json({ success: false, error:err }));
 };
 export const getMailTable = (req, res) => {
@@ -424,47 +469,47 @@ export const get_new_mail = (req, res) => {
     .catch((err) => res.status(500).json({ success: false, error:err }));
 }
 
-export const psApplication = (req, res) => {
-  const {
-    forward_to,
-    forward_by,
-    remark,
-    applicationId,
-  } = req.body;
-      db.sequelize.query( `UPDATE applications SET forward_to='${forward_to}',
-      forward_by='${forward_by}', remark='${remark}' WHERE id=${applicationId}`)
-    .then(() => {
+// export const psApplication = (req, res) => {
+//   const {
+//     forward_to,
+//     forward_by,
+//     remark,
+//     applicationId,
+//   } = req.body;
+//       db.sequelize.query( `UPDATE applications SET forward_to='${forward_to}',
+//       forward_by='${forward_by}', remark='${remark}' WHERE id=${applicationId}`)
+//     .then(() => {
       
-      //res.json({ success: true, msg:'data inserted'})
-    })
-  .catch((error) => res.status(500).json({  status:false, error }));
+//       //res.json({ success: true, msg:'data inserted'})
+//     })
+//   .catch((error) => res.status(500).json({  status:false, error }));
 
-  Remark.findOne({
-    where:{applicationId, remark_by: forward_by}
-  }).then((data)=>{
-    if(data && data.remark_to==forward_to){
-      data.update({
-        remark_to:forward_to,
-        remark_by:forward_by,
-        remark
-      })
-      .then((data)=>{ res.json({ status:true, data  })})
-      .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in updating remark'})});
-    }else{
-      Remark.create({
-        remark_to:forward_to,
-        remark_by:forward_by,
-        remark,
-        applicationId
-      })
-      // db.sequelize.query( `INSERT INTO remarks remark_to='${forward_to}, remark_by='${forward_by}', applicationId='${applicationId}' `)
-    .then((data)=>{ res.json({ status:true, data  })})
-      .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in creating remark'})});
+//   Remark.findOne({
+//     where:{applicationId, remark_by: forward_by}
+//   }).then((data)=>{
+//     if(data && data.remark_to==forward_to){
+//       data.update({
+//         remark_to:forward_to,
+//         remark_by:forward_by,
+//         remark
+//       })
+//       .then((data)=>{ res.json({ status:true, data  })})
+//       .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in updating remark'})});
+//     }else{
+//       Remark.create({
+//         remark_to:forward_to,
+//         remark_by:forward_by,
+//         remark,
+//         applicationId
+//       })
+//       // db.sequelize.query( `INSERT INTO remarks remark_to='${forward_to}, remark_by='${forward_by}', applicationId='${applicationId}' `)
+//     .then((data)=>{ res.json({ status:true, data  })})
+//       .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in creating remark'})});
     
-    }
-  }) 
-  // .then((data)=>{ res.json({ status:true, data  })})
+//     }
+//   }) 
+//   // .then((data)=>{ res.json({ status:true, data  })})
     
-  .catch((error) => { res.status(500).json({ status:false, error })});
+//   .catch((error) => { res.status(500).json({ status:false, error })});
 
-};
+// };

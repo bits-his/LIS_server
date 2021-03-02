@@ -248,5 +248,24 @@ export const getRole = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
-
+export const createUser = (req, res) => {
+  const {
+    firstname,
+    lastname,
+    username,
+    email,
+    password,
+    role,
+    accessTo,
+    department,
+    position,
+  } = req.body;
+  console.log(req.body);
+  db.sequelize
+    .query(
+      `INSERT INTO users(department,position, name, role, accessTo, username, email, password) VALUES ("${department}","${position}","${firstname+' '+lastname}","${role}","${accessTo}","${username}","${email}","${password}")`
+    )
+    .then((results) => res.json({ success: true }))
+    .catch((err) => res.status(500).json({ success: false, error:err }));
+};
 export { create, login, findAllUsers, findById, update, deleteUser, profile };
