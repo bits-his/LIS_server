@@ -23,7 +23,6 @@ import {
   getMailTable,
   getImagesURL,
   getImageRemark,
-  createUser,
   getDepartment_Position,
   getRoles,
   getUnit,
@@ -35,7 +34,11 @@ import {
   get_new_mail,
   forwardToMe,
   getAppPreview,
-  getRegistryOption
+  getRegistryOption,
+  resolveRemark,
+  getRegistryByRole,
+  getRegistryByRoleAndType,
+  getAllRemarks
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -53,9 +56,12 @@ module.exports = (app) => {
   app.post('/api/directors/create', createDirectors);
   app.get('/api/get/department', getDepartment);
   app.get('/api/get/registry', veryfyJwt, getRegistry);
+  app.get('/api/get/registry/role/:role', veryfyJwt, getRegistryByRole);
+  app.get('/api/get/role-registry/:option/:role', veryfyJwt, getRegistryByRoleAndType);
   app.get('/api/get/registries/:option', veryfyJwt, getRegistryOption);
   app.get('/api/get/mail/table', getMailTable);
   app.get('/api/get/remarks/:id', veryfyJwt, getRemarks);
+  app.get('/api/get/remarks/:status/:role', veryfyJwt, getAllRemarks);
   app.get('/api/get/images/URL/:id', getImagesURL);
   app.get('/api/get/imageRemark/:id', getImageRemark);
   app.get('/api/get/department_unit', getDepartmentUnit);
@@ -72,5 +78,6 @@ module.exports = (app) => {
   app.get('/api/get/recomendation/:user', get_recommendation);
   app.get('/api/get/new/mail/:user', get_new_mail);  
   app.get('/api/application/preview/:id', getAppPreview);
+  app.post('/api/application/remark/status', resolveRemark);
   
 };
