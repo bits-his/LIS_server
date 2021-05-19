@@ -3,8 +3,8 @@ export default (sequelize, DataTypes) => {
       applicationId:DataTypes.INTEGER ,
       tag_no:DataTypes.STRING,
       remark: DataTypes.STRING,
-      remark_to: DataTypes.STRING,
-      remark_by: DataTypes.STRING,
+      forward_to: DataTypes.STRING,
+      forward_by: DataTypes.STRING,
       status: DataTypes.BOOLEAN,
     }, {timeStamps:false});
     

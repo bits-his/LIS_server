@@ -1,7 +1,10 @@
 import db from "../models";
-const Application = db.Application
-const Role = db.Role
-const Remark = db.Remark
+const {
+  Application,
+  Role,
+  Recommendation,
+  Remark
+} = db
 
 export const createRegistry = (req, res) => {
   const { 
@@ -237,7 +240,7 @@ export const getRegistryOption = (req, res) => {
         applicationId:Application.id
       },
       order: [
-        [sequelize.fn('max', sequelize.col('id')), 'DESC'],
+        [db.sequelize.fn('max', db.sequelize.col('id')), 'DESC'],
       ],
       limit:1
     }],
@@ -260,30 +263,172 @@ export const getRemarks = (req, res) => {
     .then((results) => res.json({ success: true, results }))
     .catch((error) => res.status(500).json({ success: false, error }));
 };
+export const makeRecommendation = (req, res) => {
+  const {
+    term,
+    proposed_dev, 
+    annual_rent, 
+    dev_charges,
+    survey_charges,
+    proposed_dev_time,
+    applicationId,
+    forward_by,
+  } = req.body
+  // res.send(req.body)
+   
+  Recommendation.create({
+    term,
+    proposed_dev, 
+    annual_rent, 
+    dev_charges,
+    survey_charges,
+    proposed_dev_time,
+    submittedBy: forward_by,
+    submittedDate: Date('YYYY-MM-DD'),
+    status:req.body.disapproved===true?'Disapproved':'Approved'
+  })
 
-export const getAllRemarks = (req, res) => {
-  const { id } = req.params;
-    Application.findAll({where:{status:req.params.status, forward_to:req.params.role},
-      // include:[{
-      //   model: Application,
-      //   as: 'Application',
-      //   wehere:{
-      //     id:Application.id, forward_to:req.params.role
-      //   },
-      //   required: true,
-        
-      // }],
-      // order: [
-      //   [db.sequelize.fn('max', db.sequelize.col('Remark.id')), 'DESC'],
-      // ],
-      limit:10
+  .then((result) => {
+    Application.findOne({where:{id:applicationId}})
+    .then(data=>{
+      data.update({
+        status:'Raised', 
+        recommendationId:result.id,
+        forward_by,
+        forward_to:'PS'
+      })
     })
-    .then((results) => res.json({ success: true, results }))
+    res.json({ success: true, result})
+  })
+  .catch((error) => res.status(500).json({ success: false, error }));
+}
+export const getAllRemarks = (req, res) => {
+  const { role, status } = req.params;
+  let qr = { where:{ forward_to:role}}
+  if(status==='Treated'){
+    qr ={ where:{forward_by:role }}
+  }else if(status==='New File'){
+    qr.where.status = 'Treated'
+  }
+  qr.limit = 10;
+  Application.findAll(qr)
+  .then((results) => res.json({ success: true, results }))
+  .catch((error) => res.status(500).json({ success: false, error }));
+};
+export const setRecommendation = (req, res) => {
+  const {id, status} = req.params
+  let doneBy = req.user.role
+  let subjectTo = ''
+  let qr = {
+    status:'Approved',
+  }
+  if(doneBy==='PS'){
+    subjectTo ='Commissioner'
+    qr.approvedBy = req.user.role,
+    qr.approvedDate =Date('YYYY-mm-dd')
+  }else{
+    subjectTo ='PS'
+    qr.stampedBy = req.user.role,
+    qr.stampDate =Date('YYYY-mm-dd')
+    qr.status='Stamped'
+  }
+  Application.findOne({where:{recommendationId:id}})
+  .then((result) =>{
+    result.update({
+      remark:status, 
+      status,
+      forward_by:req.use.role,
+      forward_to:subjectTo
+    });
+  })
+  Recommendation.findOne({where:{id}})
+    .then((result) =>{
+      result.update(qr);
+      Application.findOne({where:{recommendationId:id}})
+      .then((result) =>{
+         result.update({
+          remark:status, 
+          status,
+          forward_by:req.user.role,
+          forward_to:subjectTo
+        });
+
+      })
     .catch((error) => res.status(500).json({ success: false, error }));
+    res.send({staus:true, result})
+  })
+  .catch((error) => res.status(500).json({ success: false, error }));
+};
+export const getRecommendation = (req, res) => {
+  const {id} = req.params
+  Recommendation.findOne({where:{id}})
+  .then((result) => res.json({ success: true, result }))
+  .catch((error) => res.status(500).json({ success: false, error }));
+};
+
+export const getRecommendations = (req, res) => {
+  const { role, status } = req.params;
+  let sql = "SELECT * FROM `applications` WHERE status =:status AND forward_to=:forward_to AND forward_by=:forward_by ORDER BY id ASC LIMIT 10"
+  let forward_by = ''
+  let forward_to = ''
+  if(status==='Treated'){
+    if(role==='PS'){
+      forward_by = 'Director Land'
+      forward_to='PS'
+    }else{
+      console.log({sql})
+      forward_by = 'PS'
+      forward_to='Director Land'
+    }
+  }else if(status=='Raised'){
+    if(role==='PS'){
+      forward_by ='Director Land'
+      forward_to='PS'
+    }else{
+      forward_by = 'PS'
+      forward_to='Director Land'
+    }
+  }else if(status ==='Approved'){
+    if(role==='PS'){
+      forward_by = 'PS'
+      forward_to='Commissioner'
+    }else if(role==='Commissioner'){
+      forward_by = 'PS'
+      forward_to='Commissioner'
+    }else{
+      forward_by = 'Director Land'
+      forward_to='PS'
+    }
+  }
+  else if(status ==='Stamped'){
+    if(role==='PS'){
+      forward_by = 'Commissioner'
+      forward_to='PS'
+    }else if(role==='Commissioner'){
+      forward_by = 'Commissioner'
+      forward_to='PS'
+    }
+  }
+ 
+  // res.send(sql)
+  // Application.findAll(qr)
+  db.sequelize
+  .query(sql
+    ,
+    {
+    replacements: 
+    {
+    forward_by,
+    forward_to,
+    status
+  }
+}
+)
+  .then((results) => res.json({ success: true, results:results[0] }))
+  .catch((error) => res.status(500).json({ success: false, error }));
 };
 
 export const getDepartmentUnit = (req, res) => {
-  const {} = req.params;
   db.sequelize
     .query("SELECT * FROM departments_units")
     .then((results) => res.json({ success: true, results: results[0] }))
@@ -322,14 +467,14 @@ export const updateRegistry = (req, res) => {
   .catch((error) => res.status(500).json({  status:false, error }));
 
   Remark.findOne({
-    where:{applicationId, remark_by: forward_by}
+    where:{applicationId, forward_by: forward_by}
   }).then((data)=>
   {
-    if(data && data.remark_to==forward_to)
+    if(data && data.forward_to==forward_to)
     {
       data.update({
-        remark_to:forward_to,
-        remark_by:forward_by,
+        forward_to:forward_to,
+        forward_by:forward_by,
         remark
       })
       // .then((app)=>
@@ -343,12 +488,12 @@ export const updateRegistry = (req, res) => {
       .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in updating remark'})});
     }else{
       Remark.create({
-        remark_to:forward_to,
-        remark_by:forward_by,
+        forward_to:forward_to,
+        forward_by:forward_by,
         remark,
         applicationId
       })
-      // db.sequelize.query( `INSERT INTO remarks remark_to='${forward_to}, remark_by='${forward_by}', applicationId='${applicationId}' `)
+      // db.sequelize.query( `INSERT INTO remarks forward_to='${forward_to}, forward_by='${forward_by}', applicationId='${applicationId}' `)
       // .then((data)=>{ res.json({ status:true, data  })})
       // .then((remark)=>
       // { 
@@ -387,7 +532,9 @@ export const forwardToMe = (req, res) => {
 }
 
 export const getAppPreview = (req, res) => {
-  Application.findOne({where:{ id:req.params.id},
+  let role = req.params.role
+  if(role){
+    Application.findOne({where:{ id:req.params.id},
     include:[{
       model: Remark,
       as: 'Remarks',
@@ -396,10 +543,19 @@ export const getAppPreview = (req, res) => {
       },
       required: false
     }],})
-  .then(data=>{
-    res.json({ success: true, data })
-  })
-  .catch((err) => res.status(500).json({ success: false, error:err }));
+    .then(data=>{
+      res.json({ success: true, data })
+    })
+    .catch((err) => res.status(500).json({ success: false, error:err }));
+  }else{
+    Application.findOne({where:{ id:req.params.id}})
+      .then(data=>{
+        data[Remarks]=[]
+        res.json({ success: true, data })
+      })
+      .catch((err) => res.status(500).json({ success: false, error:err }));
+  }
+  
 }
 
 export const getLetterTemplateName = (req, res) => {
@@ -561,24 +717,24 @@ export const get_new_mail = (req, res) => {
 //   .catch((error) => res.status(500).json({  status:false, error }));
 
 //   Remark.findOne({
-//     where:{applicationId, remark_by: forward_by}
+//     where:{applicationId, forward_by: forward_by}
 //   }).then((data)=>{
-//     if(data && data.remark_to==forward_to){
+//     if(data && data.forward_to==forward_to){
 //       data.update({
-//         remark_to:forward_to,
-//         remark_by:forward_by,
+//         forward_to:forward_to,
+//         forward_by:forward_by,
 //         remark
 //       })
 //       .then((data)=>{ res.json({ status:true, data  })})
 //       .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in updating remark'})});
 //     }else{
 //       Remark.create({
-//         remark_to:forward_to,
-//         remark_by:forward_by,
+//         forward_to:forward_to,
+//         forward_by:forward_by,
 //         remark,
 //         applicationId
 //       })
-//       // db.sequelize.query( `INSERT INTO remarks remark_to='${forward_to}, remark_by='${forward_by}', applicationId='${applicationId}' `)
+//       // db.sequelize.query( `INSERT INTO remarks forward_to='${forward_to}, forward_by='${forward_by}', applicationId='${applicationId}' `)
 //     .then((data)=>{ res.json({ status:true, data  })})
 //       .catch((error) => { res.status(500).json({ status:false, error , msg:'Error in creating remark'})});
     

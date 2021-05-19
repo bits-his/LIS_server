@@ -84,7 +84,8 @@ const {
   User, 
   Role, 
   Application,
-  Remark
+  Remark,
+  Recommendation
   } = db;
 
 User.hasOne(Role);

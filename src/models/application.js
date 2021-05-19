@@ -21,6 +21,7 @@ export default (sequelize, DataTypes) => {
         email	: {type: DataTypes.STRING, unique: true},
         commissioning: DataTypes.STRING,	
         forward_by: DataTypes.STRING,
+        recommendationId:DataTypes.INTEGER, 
     });
 
     return Application;

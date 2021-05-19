@@ -38,7 +38,11 @@ import {
   resolveRemark,
   getRegistryByRole,
   getRegistryByRoleAndType,
-  getAllRemarks
+  getAllRemarks,
+  makeRecommendation,
+  getRecommendations,
+  getRecommendation,
+  setRecommendation
 } from '../controllers/Director';
 
 module.exports = (app) => {
@@ -77,7 +81,11 @@ module.exports = (app) => {
   app.post('/api/update/file/number', updateFileNumber);
   app.get('/api/get/recomendation/:user', get_recommendation);
   app.get('/api/get/new/mail/:user', get_new_mail);  
-  app.get('/api/application/preview/:id', getAppPreview);
+  app.get('/api/application/preview/:id/:role', getAppPreview);
   app.post('/api/application/remark/status', resolveRemark);
+  app.post('/api/recommend', veryfyJwt, makeRecommendation);
+  app.get('/api/recommend/list/:status/:role', veryfyJwt, getRecommendations);
+  app.get('/api/get/recommendation/:id', veryfyJwt, getRecommendation);
+  app.get('/api/set/recommendation/:id/:status', veryfyJwt, setRecommendation);
   
 };

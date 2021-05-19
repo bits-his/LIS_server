@@ -9,6 +9,7 @@ export default (sequelize, DataTypes) => {
     position: DataTypes.STRING,
     department: DataTypes.STRING,
     accessToDept: DataTypes.STRING,
+    signature: DataTypes.STRING,
   });
 
   User.associate = function (models) {
