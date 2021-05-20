@@ -30,8 +30,7 @@ const create = (req, res) => {
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  let _id = Math.random() + Math.random();
-  console.log(_id);
+  let _id = Math.random().toPrecision().replace("0.", "");
 
   // User.findAll({ where: { email } }).then((user) => {
   db.sequelize
