@@ -1,6 +1,6 @@
-import passport from 'passport';
-import config from '../config/config';
-import { allowOnly } from '../services/routesHelper';
+import passport from "passport";
+import config from "../config/config";
+import { allowOnly } from "../services/routesHelper";
 import {
   create,
   login,
@@ -8,56 +8,78 @@ import {
   findById,
   update,
   deleteUser,
-  verifyUserToken,
-} from '../controllers/user';
+  profile,
+  getRole,
+  createUser,
+} from "../controllers/user";
 
 module.exports = (app) => {
   // create a new user
   app.post(
-    '/api/users/create',
+    "/api/users/create",
     // passport.authenticate('jwt', { session: false }),
     // allowOnly(config.accessLevels.admin,
-    create,
+    create
     // )
   );
 
   // user login
-  app.post('/api/users/login', login);
-  app.get('/api/user/verify', verifyUserToken);
+  app.post("/api/users/login", login);
+  app.get(
+    "/api/user/verify",
+    passport.authenticate("jwt", { session: false }),
+    profile
+  );
 
   //retrieve all users
   app.get(
-    '/api/users',
-    passport.authenticate('jwt', {
+    "/api/users",
+    passport.authenticate("jwt", {
       session: false,
     }),
-    allowOnly(config.accessLevels.admin, findAllUsers),
+    allowOnly(config.accessLevels.admin, findAllUsers)
   );
 
   // retrieve user by id
   app.get(
-    '/api/users/:userId',
-    passport.authenticate('jwt', {
+    "/api/users/:userId",
+    passport.authenticate("jwt", {
       session: false,
     }),
-    allowOnly(config.accessLevels.admin, findById),
+    allowOnly(config.accessLevels.admin, findById)
   );
 
   // update a user with id
   app.put(
-    '/api/users/:userId',
-    passport.authenticate('jwt', {
+    "/api/users/:userId",
+    passport.authenticate("jwt", {
       session: false,
     }),
-    allowOnly(config.accessLevels.user, update),
+    allowOnly(config.accessLevels.user, update)
   );
 
   // delete a user
   app.delete(
-    '/api/users/:userId',
-    passport.authenticate('jwt', {
+    "/api/users/:userId",
+    passport.authenticate("jwt", {
       session: false,
     }),
-    allowOnly(config.accessLevels.admin, deleteUser),
+    allowOnly(config.accessLevels.admin, deleteUser)
+  );
+
+  app.get(
+    "/api/user/get-postion",
+    passport.authenticate("jwt", {
+      session: false,
+    }),
+    getRole
+  );
+
+  app.post(
+    "/api/create/user",
+    passport.authenticate("jwt", {
+      session: false,
+    }),
+    createUser
   );
 };

@@ -1,42 +1,42 @@
-import express from 'express';
-import passport from 'passport';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import models from './models';
-import { profileStorage, uploadLetter, surveyor } from '../config/multer';
-import db from './models';
+import express from "express";
+import passport from "passport";
+import bodyParser from "body-parser";
+import cors from "cors";
+import models from "./models";
+import { profileStorage, uploadLetter, surveyor } from "../config/multer";
+import db from "./models";
 // const cloudinary = require('cloudinary');
-const { cloudinary } = require('./util/Cloudinary');
+const { cloudinary } = require("./util/Cloudinary");
 
 const app = express();
 
 app.use(bodyParser.json());
 
-let port = process.env.PORT || 8080; // set the view engine to ejs
-app.set('view engine', 'ejs');
+let port = process.env.PORT || 8005; // set the view engine to ejs
+app.set("view engine", "ejs");
 
 // make express look in the public directory for assets (css/js/img)
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + "/public"));
 
 app.use(cors());
 
 // force: true will drop the table if it already exits
 // models.sequelize.sync({ force: true }).then(() => {
 models.sequelize.sync().then(() => {
-  console.log('Drop and Resync with {force: true}');
+  console.log("Drop and Resync with {force: true}");
 });
 
 // passport middleware
 app.use(passport.initialize());
 
 // passport config
-require('./config/passport')(passport);
+require("./config/passport")(passport);
 
 //default route
-app.get('/', (req, res) => res.send('Hello my World'));
-require('./routes/Director.js')(app);
-require('./routes/user.js')(app);
-app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
+app.get("/", (req, res) => res.send("Hello my World"));
+require("./routes/Director.js")(app);
+require("./routes/user.js")(app);
+app.post("/api/image/upload", profileStorage.array("image"), (req, res) => {
   const data = req.files;
   const {
     today,
@@ -72,22 +72,30 @@ app.post('/api/image/upload', profileStorage.array('image'), (req, res) => {
           arr.push(req.body.form_no);
           console.log(arr);
           db.sequelize.query(
-            `INSERT INTO image_table(id, image_url) VALUES ('${arr[1]}','${arr[0]}')`
+            `INSERT INTO images(id, image_url) VALUES ('${arr[0]}')`
           );
         });
       }
     })
-    .then((results) => res.json({ success: true, results }))
-    .catch((err) => res.json({ success: false, err }));
+    .then((result) => {
+      db.sequelize
+        .query(`UPDATE INTO application_form SET image_id=${result["id"]}')`)
+        .then()
+        .catch((err) => res.json({ success: false, err }));
+
+      if (raresultw) res.json({ success: true, raw });
+    })
+    .catch((err) => res.json({ success: false, msg: err }));
 });
 
 app.post(
-  '/api/letter/images/upload',
-  uploadLetter.array('image'),
+  "/api/letter/images/upload",
+  uploadLetter.array("image"),
   (req, res) => {
     db.sequelize
       .query(
-        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) VALUES ('${req.body.selectLetter}','${req.body.selectCC}','${req.body.remarks}')`
+        `INSERT INTO letter_of_stakeholder(select_letter_template, selectedcc, remarks) 
+        VALUES ('${req.body.selectLetter}','${req.body.selectCC}','${req.body.remarks}')`
       )
       .then(() => {
         const data = req.files;
@@ -96,7 +104,7 @@ app.post(
             let arr = [];
             arr.push(item.path);
             db.sequelize.query(
-              `INSERT INTO image_table( image_url) VALUES ("${arr}")`
+              `INSERT INTO images( image_url) VALUES ("${arr}")`
             );
           });
         }
@@ -106,7 +114,7 @@ app.post(
   }
 );
 
-app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
+app.post("/api/surveyor/images/upload", surveyor.array("image"), (req, res) => {
   const data = req.files;
   db.sequelize
     .query(
@@ -118,7 +126,7 @@ app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
           let arr = [];
           arr.push(item.path);
           db.sequelize.query(
-            `INSERT INTO image_table( image_url) VALUES ("${arr}")`
+            `INSERT INTO images( image_url) VALUES ("${arr}")`
           );
         });
       }
@@ -127,25 +135,25 @@ app.post('/api/surveyor/images/upload', surveyor.array('image'), (req, res) => {
     .catch((err) => res.status(500).json({ err }));
 });
 
-// app.post('/api/image/upload', async (req, res) => {
-//   try {
-//     const image = req.body;
-//     console.log(image)
-//     const uploadedReponse = await cloudinary.uploader.upload(`${image}`,{
-//       upload_preset:"myimage"
-//     })
-//     console.log(uploadedReponse)
-//     res.json({msg:'uploaded'})
-//   } catch (error) {
-//     console.log(error)
-//     res.status(500).json({msg:"not uploaded"})
-//   }
-// });
+app.post("/api/image/upload", async (req, res) => {
+  try {
+    const image = req.body;
+    console.log(image);
+    const uploadedReponse = await cloudinary.uploader.upload(`${image}`, {
+      upload_preset: "myimage",
+    });
+    console.log(uploadedReponse);
+    res.json({ msg: "uploaded" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ msg: "not uploaded" });
+  }
+});
 
 //create a server
 var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;
 
-  console.log('App listening at http://%s:%s', host, port);
+  console.log("App listening at http://%s:%s", host, port);
 });
