@@ -227,15 +227,31 @@ export const makeRecommendation = (req, res) => {
 
 export const getRemarks = (req, res) => {
   let { role, query_type } = req.params;
-  let sql = `SELECT * FROM public."Remarks" `;
+  let sql = `SELECT   *  FROM public."Remarks"  WHERE forward_to`;
   if (query_type == "by_all") {
-    sql += ` WHERE forward_to !='${role}'`;
+    sql += `  NOT :role`;
+  } else if (query_type == "by_me") {
+    sql += ` IS NOT role`;
   } else {
-    sql += ` WHERE forward_to !='${role}'`;
+    sql += ` IS NOT NULL`;
   }
   db.sequelize
-    .query(sql)
-    .then((results) => res.json({ success: true, data: results[0] }))
+    .query(sql, {
+      replacements: {
+        role,
+      },
+    })
+    .then((results) => {
+      let data = results[0];
+      if (query_type == "by_none") {
+        data.map(
+          (remark) =>
+            (remark.forward_to = remark.forward_to +=
+              " (" + remark.remark + ")")
+        );
+      }
+      res.json({ success: true, data });
+    })
     .catch((error) => res.status(500).json({ success: false, error }));
 };
 
