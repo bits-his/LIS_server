@@ -33,6 +33,7 @@ import {
   getAppPreview,
   resolveRemark,
   makeRecommendation,
+  updateRecommendation,
   // getRecommendations,
   getRecommendation,
   // setRecommendation,
@@ -71,6 +72,7 @@ module.exports = (app) => {
   app.get("/api/application/preview/:id/:role", getAppPreview);
   app.post("/api/application/remark/status", resolveRemark);
   app.post("/api/recommend", veryfyJwt, makeRecommendation);
+  app.post("/api/update/recommendation", veryfyJwt, updateRecommendation);
   // app.get("/api/recommend/list/:status/:role", veryfyJwt, getRecommendations);
   app.get("/api/get/recommendation/:id", veryfyJwt, getRecommendation);
   app.get("/api/get/comments/:id", veryfyJwt, getComments);

@@ -160,23 +160,15 @@ export const getUnit = (req, res) => {
 
 export const getRegistries = (req, res) => {
   let { role, status } = req.params;
-  let forward_to = role;
-  let query_type = null;
+  let statusArr = status.split(",");
 
-  switch (role) {
-    case "PSSecretary":
-      query_type = "New File";
-      break;
-    default:
-      query_type = status;
-  }
-
-  const sql = `SELECT * from get_files (:query_type)`;
+  const sql = `SELECT * from get_files (:role, :status)`;
   console.log({ sql });
   db.sequelize
     .query(sql, {
       replacements: {
-        query_type,
+        role,
+        status,
       },
     })
     .then((results) => res.json({ success: true, results: results[0] }))
@@ -187,54 +179,27 @@ export const getRegistries = (req, res) => {
 };
 
 export const makeRecommendation = (req, res) => {
-  const {
-    term,
-    proposed_dev,
-    annual_rent,
-    dev_charges,
-    survey_charges,
-    proposed_dev_time,
-    applicationId,
-    forward_by,
-  } = req.body;
-  // res.send(req.body)
-
-  Recommendation.create({
-    term,
-    proposed_dev,
-    annual_rent,
-    dev_charges,
-    survey_charges,
-    proposed_dev_time,
-    submittedBy: forward_by,
-    submittedDate: Date("YYYY-MM-DD"),
-    status: req.body.disapproved === true ? "Disapproved" : "Approved",
-  })
-
-    .then((result) => {
-      Application.findOne({ where: { id: applicationId } }).then((data) => {
-        data.update({
-          status: "Raised",
-          recom_id: result.id,
-          forward_by,
-          forward_to: "PS",
-        });
-      });
-      res.json({ success: true, result });
-    })
-    .catch((error) => res.status(500).json({ success: false, error }));
+  const {term,comment,proposed_dev,annual_rent,dev_charges,survey_charges,proposed_dev_time,applicationId,forward_by,forward_to} = req.body;
+  let sql = `CALL make_recommendation(:applicationId,:comment,:term,:proposed_dev,:annual_rent,:dev_charges,:survey_charges,:proposed_dev_time,:forward_by,:forward_to )`;
+  db. sequelize.query(sql,{replacements:{term,comment,proposed_dev,annual_rent,dev_charges,applicationId,survey_charges,proposed_dev_time,forward_by,forward_to }})
+  .then((result) =>res.json({ success: true, result }))
+  .catch((error) =>res.status(500).json({ success: false, error }));
 };
 
+export const updateRecommendation = (req, res) => {
+  const {comment, remark, id,forward_to, forward_by} = req.body;
+  let sql = `CALL update_recommendation(:id,:comment,:remark,forward_by,:forward_to )`;
+  db. sequelize.query(sql,{replacements:{id,comment,remark, forward_by, forward_to }})
+  .then((result) =>res.json({ success: true, result }))
+  .catch((error) =>res.status(500).json({ success: false, error }));
+};
 export const getRemarks = (req, res) => {
-  let { role, query_type } = req.params;
-  let sql = `SELECT   *  FROM public."Remarks"  WHERE forward_to`;
-  if (query_type == "by_all") {
-    sql += `  NOT :role`;
-  } else if (query_type == "by_me") {
-    sql += ` IS NOT role`;
-  } else {
-    sql += ` IS NOT NULL`;
-  }
+  let { role, query_type , sql} = req.params;
+  if(query_type=='my_remaks')
+    sql = `SELECT * FROM my_remarks (:role)`
+  else
+    sql = `SELECT * FROM others_remark (:role)`
+    
   db.sequelize
     .query(sql, {
       replacements: {
@@ -244,11 +209,11 @@ export const getRemarks = (req, res) => {
     .then((results) => {
       let data = results[0];
       if (query_type == "by_none") {
-        data.map(
-          (remark) =>
-            (remark.forward_to = remark.forward_to +=
-              " (" + remark.remark + ")")
-        );
+        // data.map(
+        //   (remark) =>
+        //     (remark.forward_to = remark.forward_to +=
+        //       " (" + remark.remark + ")")
+        // );
       }
       res.json({ success: true, data });
     })
@@ -324,7 +289,7 @@ export const updateRegistry = (req, res) => {
   let { forward_to, forward_by, comment, remark, id } = req.body;
   db.sequelize
     .query(
-      `CALL make_remark (:id,:remark, :comment, :forward_to,:forward_by);`,
+      `CALL make_remark (:id,:comment, :remark, :forward_to,:forward_by);`,
       {
         replacements: {
           forward_by,

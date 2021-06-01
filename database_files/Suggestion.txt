@@ -1,0 +1,16 @@
+
+Remark section should include only
+    1. Comment :  Reason for signing or rejecting the File
+    2. Remark  :  File main status is of three type (Accepted, Treated, UnTreated)
+        Remark status also are based on the active Tab e.g.:
+        1. File Tab remarks: File NewFile, TreatedFile and UnTreatedFile (File as suffix)
+        2. Recommendation Remarks: NewRecommendation,Treated Recommendation and UnTreatedRecommendation
+        ....
+        This resulted in 9 different Remarks.
+
+    Finding:
+    1. All file status should be store in DB to avoid hard codded style
+        Table columns: Status and foward_to.
+
+        Reason:
+        1. A profer file status will clearly detarmine who is the reciver of the file
