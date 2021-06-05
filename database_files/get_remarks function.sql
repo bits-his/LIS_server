@@ -1,32 +1,32 @@
 
-CREATE OR REPLACE FUNCTION my_remarks( role  VARCHAR(20)
+CREATE OR REPLACE FUNCTION my_status( role  VARCHAR(20)
 )
-  RETURNS TABLE ( remark_to_txt VARCHAR,  remark_txt VARCHAR)
+  RETURNS TABLE ( forward_to_txt VARCHAR,  status_txt VARCHAR)
   
   LANGUAGE plpgsql
   AS $$
 
 BEGIN
 	RETURN QUERY
-  SELECT DISTINCT (remark_to) remark_to_txt, remark as remark_txt FROM public."Remarks"  
-  WHERE remark_to = role  ORDER BY remark ASC;
+  SELECT DISTINCT (forward_to) forward_to_txt, status as status_txt FROM public."Remarks" R 
+  WHERE R.forward_to = role   AND R.forward_by IS NOT NULL  ORDER BY R.status ASC;
 
 END;
 $$
 
 
 
-CREATE OR REPLACE FUNCTION others_remark( role  VARCHAR(20)
+CREATE OR REPLACE FUNCTION others_status( role  VARCHAR(20)
 )
-  RETURNS TABLE (remark_to_txt VARCHAR, remark_txt VARCHAR)
+  RETURNS TABLE (forward_to_txt VARCHAR, status_txt VARCHAR)
   
   LANGUAGE plpgsql
   AS $$
 
 BEGIN
 	RETURN QUERY
-  SELECT DISTINCT (remark_to) remark_to_txt, remark as remark_txt FROM public."Remarks"  
-  WHERE remark_to != role  AND remark_by IS NOT NULL  ORDER BY remark ASC;
+  SELECT DISTINCT (forward_to) forward_to_txt, status as status_txt FROM public."Remarks" R  
+  WHERE R.forward_to != role  AND R.forward_by IS NOT NULL  ORDER BY R.status ASC;
 
 END;
 $$

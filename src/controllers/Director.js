@@ -2,49 +2,11 @@ import db from "../models";
 const { Application, Role, Recommendation, Remark } = db;
 import moment from "moment";
 export const createRegistry = (req, res) => {
-  const {
-    application_type,
-    name,
-    amount,
-    address,
-    email,
-    phone,
-    other_info,
-    tp_no,
-    plot_no,
-    amount_paid,
-    reciept_no,
-    forward_to,
-    forward_by,
-    status,
-  } = req.body;
+  const { application_type,name,amount,address,email,phone,other_info,tp_no,plot_no,amount_paid,reciept_no,forward_to,forward_by,status} = req.body;
   let application_date = moment().format("YYYY-MM-DD");
   let year_code = moment().format("YYYY");
-
-  db.sequelize
-    .query(
-      `CALL create_file (:year_code,:application_date,:application_type,:name,:amount,:address,:email,:phone,:other_info,:tp_no,:plot_no,:amount_paid,:reciept_no,:forward_to,:forward_by,:status);`,
-      {
-        replacements: {
-          year_code,
-          application_date,
-          application_type,
-          name,
-          amount,
-          address,
-          email,
-          phone,
-          other_info,
-          tp_no,
-          plot_no,
-          amount_paid,
-          reciept_no,
-          forward_to,
-          forward_by,
-          status,
-        },
-      }
-    )
+  db.sequelize.query(`CALL create_file (:year_code,:application_date,:application_type,:name,:amount,:address,:email,:phone,:other_info,:tp_no,:plot_no,:amount_paid,:reciept_no,:forward_to,:forward_by,:status);`,
+      {replacements: {year_code,application_date,application_type,name,amount,address,email,phone,other_info,tp_no,plot_no,amount_paid,reciept_no,forward_to,forward_by,status}})
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((error) => res.status(500).json({ success: false, error }));
 };
@@ -160,63 +122,53 @@ export const getUnit = (req, res) => {
 
 export const getRegistries = (req, res) => {
   let { role, status } = req.params;
-  let statusArr = status.split(",");
-
   const sql = `SELECT * from get_files (:role, :status)`;
-  console.log({ sql });
-  db.sequelize
-    .query(sql, {
-      replacements: {
-        role,
-        status,
-      },
-    })
+  db.sequelize.query(sql, {replacements: {role,status}} )
     .then((results) => res.json({ success: true, results: results[0] }))
-    .catch((error) => {
-      console.log({ error });
-      res.status(500).json({ success: false, error });
-    });
+    .catch((error) => res.status(500).json({ success: false, error }));
 };
 
 export const makeRecommendation = (req, res) => {
-  const {term,comment,proposed_dev,annual_rent,dev_charges,survey_charges,proposed_dev_time,applicationId,forward_by,forward_to} = req.body;
-  let sql = `CALL make_recommendation(:applicationId,:comment,:term,:proposed_dev,:annual_rent,:dev_charges,:survey_charges,:proposed_dev_time,:forward_by,:forward_to )`;
-  db. sequelize.query(sql,{replacements:{term,comment,proposed_dev,annual_rent,dev_charges,applicationId,survey_charges,proposed_dev_time,forward_by,forward_to }})
+  const {query_type,recom_id,term,status,remark,proposed_dev,annual_rent,dev_charges,survey_charges,proposed_dev_time,id,forward_by,forward_to} = req.body;
+  let sql = `CALL recommendation_queries(:query_type,:id,:recom_id,:status,:remark,:term,:proposed_dev,:annual_rent,:dev_charges,:survey_charges,:proposed_dev_time,:forward_by,:forward_to )`;
+ console.log({QQQQQQQQQQQWWWWWWWWWWW: `CALL recommendation_queries(${query_type},${id},${recom_id},${status},${remark},${term},${proposed_dev},${annual_rent},${dev_charges},${survey_charges},${proposed_dev_time},${forward_by},${forward_to} )`})
+  db. sequelize.query(sql,{replacements:{query_type,id, recom_id,status,remark,term,proposed_dev,annual_rent,dev_charges,id,survey_charges,proposed_dev_time,forward_by,forward_to }})
   .then((result) =>res.json({ success: true, result }))
   .catch((error) =>res.status(500).json({ success: false, error }));
 };
 
-export const updateRecommendation = (req, res) => {
-  const {comment, remark, id,forward_to, forward_by} = req.body;
-  let sql = `CALL update_recommendation(:id,:comment,:remark,forward_by,:forward_to )`;
-  db. sequelize.query(sql,{replacements:{id,comment,remark, forward_by, forward_to }})
+export const grantQueries = (req, res) => {
+  const {query_type,id, r_of_o_no,plot_no,plan_no,ground_rent,improvement_value,improvement_term,remark,signed_by, forward_to, forward_by} = req.body;
+  const sql =`CALL grant_queries(:query_type,:id,:r_of_o_no,:plot_no,:plan_no,:ground_rent,:improvement_value,:improvement_term,:remark,:signed_by,:forward_to,:forward_by) `
+  db.sequelize.query(sql,{replacements:{query_type,id, r_of_o_no,plot_no,plan_no,ground_rent,improvement_value,improvement_term,remark, signed_by, forward_to, forward_by}}) 
   .then((result) =>res.json({ success: true, result }))
   .catch((error) =>res.status(500).json({ success: false, error }));
-};
+}
 export const getRemarks = (req, res) => {
   let { role, query_type , sql} = req.params;
-  if(query_type=='my_remaks')
-    sql = `SELECT * FROM my_remarks (:role)`
+  if(query_type=='my_status')
+    sql = `SELECT * FROM my_status (:role)`
   else
-    sql = `SELECT * FROM others_remark (:role)`
+    sql = `SELECT * FROM others_status (:role)`
     
-  db.sequelize
-    .query(sql, {
-      replacements: {
-        role,
-      },
-    })
+  db.sequelize.query(sql, {replacements: {  role  }  })
     .then((results) => {
       let data = results[0];
-      if (query_type == "by_none") {
-        // data.map(
-        //   (remark) =>
-        //     (remark.forward_to = remark.forward_to +=
-        //       " (" + remark.remark + ")")
-        // );
-      }
-      res.json({ success: true, data });
+      res.json({ success: true, data:data.length?data[0]:[] });
     })
+    .catch((error) => res.status(500).json({ success: false, error }));
+};
+
+export const getRemark = (req, res) => {
+  let { id , query_type, sql} = req.params;
+  sql = `SELECT * FROM `
+  if(query_type === 'next'){
+    sql +=  ` get_next_status (:id)`
+  }else{
+    sql +=  ` get_status (:id)`
+  }
+  db.sequelize.query(sql, {replacements: {  id  }  })
+    .then((data) =>  res.json({ success: true, data:data[0] })  )
     .catch((error) => res.status(500).json({ success: false, error }));
 };
 
@@ -286,20 +238,10 @@ export const rejectRegistry = (req, res) => {
 };
 
 export const updateRegistry = (req, res) => {
-  let { forward_to, forward_by, comment, remark, id } = req.body;
+  let { forward_to, status, forward_by, remark, id } = req.body;
   db.sequelize
-    .query(
-      `CALL make_remark (:id,:comment, :remark, :forward_to,:forward_by);`,
-      {
-        replacements: {
-          forward_by,
-          forward_to,
-          comment,
-          remark,
-          id,
-        },
-      }
-    )
+    .query(`CALL make_remark (:id, :status, :remark, :forward_to,:forward_by)`,
+      {replacements: {forward_by,forward_to,status,remark,id } })
     .then((results) => res.json({ success: true }))
     .catch((error) => res.status(500).json({ success: false, error }));
 };
@@ -388,10 +330,9 @@ export const getDepartment_Position = (req, res) => {
 export const getRoles = (req, res) => {
   // const { id } = req.user.id;
   db.sequelize
-    .query(`SELECT role FROM public."Users" WHERE role IS NOT NULL`)
-    .then((results) => {
-      console.log(results[0]);
-      res.json({ success: true, data: results[0] });
+    .query(`SELECT role FROM public."Users" `)
+    .then((data) => {
+      res.json({ success: true, data:data[0]});
     })
     .catch((err) => res.status(500).json({ success: false, error: err }));
 };

@@ -9,6 +9,7 @@ export default (sequelize, DataTypes) => {
     position: DataTypes.STRING,
     department: DataTypes.STRING,
     accessToDept: DataTypes.STRING,
+    accessToFiles: DataTypes.STRING,
     signature: DataTypes.STRING,
   });
 

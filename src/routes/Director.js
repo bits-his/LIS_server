@@ -8,6 +8,7 @@ import {
   getDepartment,
   createDirectors,
   getRegistries,
+  getRemark,
   getRemarks,
   getComments,
   getDepartmentUnit,
@@ -33,10 +34,11 @@ import {
   getAppPreview,
   resolveRemark,
   makeRecommendation,
-  updateRecommendation,
+  // updateRecommendation,
   // getRecommendations,
   getRecommendation,
   // setRecommendation,
+  grantQueries
 } from "../controllers/Director";
 
 module.exports = (app) => {
@@ -45,7 +47,7 @@ module.exports = (app) => {
   app.get("/api/get/review/range", getReviewRange);
   app.post("/api/rate/charge", createRateCharge);
   app.get("/api/get/department/position", getDepartment_Position);
-  app.get("/api/get-roles", veryfyJwt, getRoles);
+  app.get("/api/get-roles",  getRoles);
   app.post("/api/site_file/create", createSiteFile);
   app.post("/api/letter_template/create", createLetterTemplate);
   // app.post('/api/departmentunit/create', createDepartmentunit);
@@ -54,6 +56,7 @@ module.exports = (app) => {
   app.get("/api/get/department", getDepartment);
   app.get("/api/get/registry/role/:role", veryfyJwt, getRegistries);
   app.get("/api/get/remarks/:query_type/:role", veryfyJwt, getRemarks);
+  app.get("/api/get/remark/:query_type/:id", veryfyJwt, getRemark);
   app.get("/api/get/registries/:status/:role", veryfyJwt, getRegistries);
   app.get("/api/get/images/URL/:id", getImagesURL);
   app.get("/api/get/imageRemark/:id", getImageRemark);
@@ -72,9 +75,11 @@ module.exports = (app) => {
   app.get("/api/application/preview/:id/:role", getAppPreview);
   app.post("/api/application/remark/status", resolveRemark);
   app.post("/api/recommend", veryfyJwt, makeRecommendation);
-  app.post("/api/update/recommendation", veryfyJwt, updateRecommendation);
+  // app.post("/api/update/recommendation", veryfyJwt, updateRecommendation);
   // app.get("/api/recommend/list/:status/:role", veryfyJwt, getRecommendations);
   app.get("/api/get/recommendation/:id", veryfyJwt, getRecommendation);
   app.get("/api/get/comments/:id", veryfyJwt, getComments);
   // app.get("/api/set/recommendation/:id/:status", veryfyJwt, setRecommendation);
+  // GRANT ROUTES
+  app.post("/api/post/grant-letter", veryfyJwt, grantQueries);
 };

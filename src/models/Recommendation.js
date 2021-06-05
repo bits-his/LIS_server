@@ -1,5 +1,6 @@
 export default (sequelize, DataTypes) => {
   const Recommendation = sequelize.define('Recommendation', {
+    app_id:DataTypes.INTEGER,
     term:DataTypes.STRING,
     proposed_dev:DataTypes.STRING, 
     annual_rent:DataTypes.STRING, 
