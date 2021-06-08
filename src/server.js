@@ -1,0 +1,42 @@
+import express from "express";
+import passport from "passport";
+import bodyParser from "body-parser";
+import cors from "cors";
+import models from "./models";
+import { profileStorage, uploadLetter, surveyor } from "../config/multer";
+import db from "./models";
+// const cloudinary = require('cloudinary');
+const { cloudinary } = require("./util/Cloudinary");
+
+const app = express();
+
+app.use(bodyParser.json());
+
+let port = process.env.PORT || 8005; // set the view engine to ejs
+app.set("view engine", "ejs");
+
+// make express look in the public directory for assets (css/js/img)
+app.use(express.static(__dirname + "/public"));
+
+app.use(cors());
+
+// force: true will drop the table if it already exits
+// models.sequelize.sync({ force: true }).then(() => {
+models.sequelize.sync().then(() => {
+  console.log("Drop and Resync with {force: true}");
+});
+
+// passport middleware
+app.use(passport.initialize());
+// import other routes
+require("./routes/GIS.js")(app);
+require("./routes/user.js")(app);
+
+// passport config
+require("./config/passport")(passport);
+//create a server
+var server = app.listen(port, function () {
+  var host = server.address().address;
+  var port = server.address().port;
+  console.log("App listening at http://%s:%s", host, port);
+});
