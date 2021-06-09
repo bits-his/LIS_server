@@ -13,10 +13,11 @@ import {
   createUser,
 } from "../controllers/user";
 
+const api = `/api/v1/gis`
 module.exports = (app) => {
   // create a new user
   app.post(
-    "/api/users/create",
+    `${api}/users/create`,
     // passport.authenticate('jwt', { session: false }),
     // allowOnly(config.accessLevels.admin,
     create
@@ -24,16 +25,16 @@ module.exports = (app) => {
   );
 
   // user login
-  app.post("/api/users/login", login);
+  app.post(`${api}/users/login`, login);
   app.get(
-    "/api/user/verify",
+    `${api}/user/verify`,
     passport.authenticate("jwt", { session: false }),
     profile
   );
 
   //retrieve all users
   app.get(
-    "/api/users",
+    `${api}/users`,
     passport.authenticate("jwt", {
       session: false,
     }),
@@ -42,7 +43,7 @@ module.exports = (app) => {
 
   // retrieve user by id
   app.get(
-    "/api/users/:userId",
+    `${api}/users/:userId`,
     passport.authenticate("jwt", {
       session: false,
     }),
@@ -51,7 +52,7 @@ module.exports = (app) => {
 
   // update a user with id
   app.put(
-    "/api/users/:userId",
+    `${api}/users/:userId`,
     passport.authenticate("jwt", {
       session: false,
     }),
@@ -60,7 +61,7 @@ module.exports = (app) => {
 
   // delete a user
   app.delete(
-    "/api/users/:userId",
+    `${api}/users/:userId`,
     passport.authenticate("jwt", {
       session: false,
     }),
@@ -68,7 +69,7 @@ module.exports = (app) => {
   );
 
   app.get(
-    "/api/user/get-postion",
+    `${api}/user/get-postion`,
     passport.authenticate("jwt", {
       session: false,
     }),
@@ -76,7 +77,7 @@ module.exports = (app) => {
   );
 
   app.post(
-    "/api/create/user",
+    `${api}/create/user`,
     passport.authenticate("jwt", {
       session: false,
     }),
