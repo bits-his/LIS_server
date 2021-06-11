@@ -8,24 +8,39 @@ export const occupantQueries = (req, res) => {
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((error) => res.status(500).json({ success: false, error }));
 };
-
+export const getOccupants = (req, res) => {
+    const {query_type,id} = req.params;
+    db.sequelize.query(`SELECT * FROM public.get_occupants ('${query_type}','${id}')`)
+      .then((results) => res.json({ success: true, data: results[0] }))
+      .catch((error) => res.status(500).json({ success: false, error }));
+};
 export const parcelQueries = (req, res) => {
     const {query_type,name,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,formal_document,informal_document,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area} = req.body;
-    db.sequelize.query(`CALL parcel_queries (:query_type,:name,:state,:district,:lga,:ward,:address,:property_id_no,:block_no,:plot_no,:street_name,:owner_name,:owner_type,:owner_geder,:telephone1,:telephone2,:occupancy_type,:any_buildings,:main_use,:parcel_fenced,:size_in_m2,:formal_document,:informal_document,:water,:sewerage,:electricity,:street_lights,:waste_disposal,:shape_length,:shape_area);`,
+    db.sequelize.query(`SELECT * FROM public.parcel_insert (:query_type,:name,:state,:district,:lga,:ward,:address,:property_id_no,:block_no,:plot_no,:street_name,:owner_name,:owner_type,:owner_geder,:telephone1,:telephone2,:occupancy_type,:any_buildings,:main_use,:parcel_fenced,:size_in_m2,:formal_document,:informal_document,:water,:sewerage,:electricity,:street_lights,:waste_disposal,:shape_length,:shape_area);`,
         {replacements: {
             query_type,name,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,formal_document,informal_document,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area}})
-      .then((results) => res.json({ success: true, results: results[0] }))
+      .then((results) => res.json({ success: true, id: results[0][0].parcel_insert }))
+      .catch((error) => res.status(500).json({ success: false, error }));
+  };
+
+  export const getParcels = (req, res) => {
+    const {query_type,id} = req.params;
+    db.sequelize.query(`SELECT * FROM public.get_parcels ('${query_type}','${id}')`)
+      .then((results) => res.json({ success: true, data: results[0] }))
       .catch((error) => res.status(500).json({ success: false, error }));
   };
 
   export const structureQueries = (req, res) => {
-    const {
-
-        query_type,structure_id,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area} = req.body;
-    db.sequelize.query(`CALL structure_queries (:query_type,:structure_id,:finished,:level_of_completion,:year_completed,:main_use,:residential_type,:wall_material,:roof_covering,:roof_type,:no_floors,:no_of_occupants,:property_id_no,:parcel_id,:shape_length,:shape_area);`,
-        {replacements: {query_type,structure_id,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area}})
-      .then((results) => res.json({ success: true, results: results[0] }))
+    const {query_type,structure_id,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area} = req.body;
+    db.sequelize.query(`SELECT * FROM public.structure_insert ('${query_type}','${structure_id}','${finished}','${level_of_completion}','${year_completed}','${main_use}','${residential_type}','${wall_material}','${roof_covering}','${roof_type}','${no_floors}','${no_of_occupants}','${property_id_no}','${parcel_id}','${shape_length}','${shape_area}');`)
+      .then((results) => res.json({ success: true, results: results[0][0]}))
       .catch((error) => res.status(500).json({ success: false, error }));
   };
-  
+
+  export const getStructures = (req, res) => {
+    const {query_type,id} = req.params;
+    db.sequelize.query(`SELECT * FROM public.get_structures ('${query_type}','${id}')`)
+      .then((results) => res.json({ success: true, data: results[0] }))
+      .catch((error) => res.status(500).json({ success: false, error }));
+  };
 
