@@ -2,10 +2,10 @@ import db from "../models";
 import moment from "moment";
 
 export const occupantQueries = (req, res) => {
-  const {query_type,occupant_id,floor_area_m2,name_of_occupant,type_of_occupant,use_type_of_unit,occupier_is_owner,owner_details,tel_mobile,tel_home,parcels_id,structure_id} = req.body;
-  db.sequelize.query(`CALL occupant_queries (:query_type,:occupant_id,:floor_area_m2,:name_of_occupant,:type_of_occupant,:use_type_of_unit,:occupier_is_owner,:owner_details,:tel_mobile,:tel_home,:parcels_id,:structure_id);`,
-      {replacements: {	query_type,occupant_id,floor_area_m2,name_of_occupant,type_of_occupant,use_type_of_unit,occupier_is_owner,owner_details,tel_mobile,tel_home,parcels_id,structure_id}})
-    .then((results) => res.json({ success: true, results: results[0] }))
+  const {query_type,occupant_id,floor_area_m2,name_of_occupant,type_of_occupant,use_type_of_unit,occupier_is_owner,owner_details,tel_mobile,tel_home,parcel_id,structure_id} = req.body;
+  db.sequelize.query
+  (`SELECT * FROM  public.occupant_insert('${query_type}','${floor_area_m2}','${name_of_occupant}','${type_of_occupant}','${use_type_of_unit}','${occupier_is_owner}','${owner_details}','${tel_mobile}','${tel_home}','${structure_id}','${parcel_id}')`)
+    .then((results) => res.json({ success: true, id: results[0][0].occupant_insert }))
     .catch((error) => res.status(500).json({ success: false, error }));
 };
 export const getOccupants = (req, res) => {
@@ -31,9 +31,9 @@ export const parcelQueries = (req, res) => {
   };
 
   export const structureQueries = (req, res) => {
-    const {query_type,structure_id,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area} = req.body;
-    db.sequelize.query(`SELECT * FROM public.structure_insert ('${query_type}','${structure_id}','${finished}','${level_of_completion}','${year_completed}','${main_use}','${residential_type}','${wall_material}','${roof_covering}','${roof_type}','${no_floors}','${no_of_occupants}','${property_id_no}','${parcel_id}','${shape_length}','${shape_area}');`)
-      .then((results) => res.json({ success: true, results: results[0][0]}))
+    const {query_type,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area} = req.body;
+    db.sequelize.query(`SELECT * FROM public.structure_insert ('${query_type}','${finished}','${level_of_completion}','${year_completed}','${main_use}','${residential_type}','${wall_material}','${roof_covering}','${roof_type}','${no_floors}','${no_of_occupants}','${property_id_no}','${parcel_id}','${shape_length}','${shape_area}');`)
+      .then((results) => res.json({ success: true, results: results[0][0].structure_insert}))
       .catch((error) => res.status(500).json({ success: false, error }));
   };
 
