@@ -25,4 +25,4 @@ module.exports = {
     "dialect":process.env.db_dialect,
     "operatorsAliases": false
   }
-}
+} 

@@ -4,7 +4,6 @@ import fs from "fs";
 import path from "path";
 import Sequelize from "sequelize";
 require("dotenv").config();
-const URL = require('url');
 const env = process.env.NODE_ENV || 'development';
 const basename = path.basename(__filename);
 const config = require(__dirname + '/../config/pgdb.js')[env];
