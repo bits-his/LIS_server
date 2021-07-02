@@ -1,21 +1,28 @@
 import passport from "passport";
+import config from "../config/config";
 const veryfyJwt = passport.authenticate("jwt", { session: false });
-import {
-  getStructures,
-  structureQueries,
-  getOccupants,
-  occupantQueries,
-  getParcels,
-  parcelQueries,
 
+const {api} = config;
+import {
+  getParcels,
+  savePolygon,
+  getPolygons,
+  getOccupants,
+  getStructures,
+  parcelQueries,
+  occupantQueries,
+  structureQueries,
+  getSummaryReport,
 } from "../controllers/GIS";
-  const api = `/api/v1/gis`
 
 module.exports = (app) => {
-  app.get(`${api}/get/structures/:query_type/:id`,getStructures);
-  app.post(`${api}/structure`,structureQueries);
-  app.get(`${api}/get/parcels/:query_type/:id`,getParcels);
   app.post(`${api}/parcel`,parcelQueries);
-  app.get(`${api}/get/occupants/:query_type/:id`,getOccupants);
   app.post(`${api}/occupant`,occupantQueries);
+  app.post(`${api}/structure`,structureQueries);
+  app.post(`${api}/post/get-polygons`,getPolygons);
+  app.post(`${api}/post/save-polygon`, savePolygon);
+  app.get(`${api}/get/parcels/:query_type/:id`,getParcels);
+  app.get(`${api}/get/occupants/:query_type/:id`,getOccupants);
+  app.get(`${api}/get/structures/:query_type/:id`,getStructures);
+  app.get(`${api}/get/summary-report/:query_type?`,veryfyJwt, getSummaryReport);
 }

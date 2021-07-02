@@ -8,7 +8,7 @@ export default (sequelize, DataTypes) => {
       comment: DataTypes.STRING,
       forward_to: DataTypes.STRING,
       forward_by: DataTypes.STRING,
-      status: DataTypes.BOOLEAN,
+      status: DataTypes.STRING,
     },
     { timeStamps: false }
   );

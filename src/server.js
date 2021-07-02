@@ -6,7 +6,7 @@ import models from "./models";
 import { profileStorage, uploadLetter, surveyor } from "../config/multer";
 import db from "./models";
 // const cloudinary = require('cloudinary');
-const { cloudinary } = require("./util/Cloudinary");
+const { cloudRoute } = require("./util/Cloudinary");
 
 const app = express();
 
@@ -31,6 +31,9 @@ app.use(passport.initialize());
 // import other routes
 require("./routes/GIS.js")(app);
 require("./routes/user.js")(app);
+require("./routes/Director.js")(app);
+// require("./routes/PostGIS.js")(app);
+cloudRoute(app);
 
 // passport config
 require("./config/passport")(passport);

@@ -14,33 +14,71 @@ export const getOccupants = (req, res) => {
       .then((results) => res.json({ success: true, data: results[0] }))
       .catch((error) => res.status(500).json({ success: false, error }));
 };
+
 export const parcelQueries = (req, res) => {
-    const {query_type,name,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,formal_document,informal_document,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area} = req.body;
-    db.sequelize.query(`SELECT * FROM public.parcel_insert (:query_type,:name,:state,:district,:lga,:ward,:address,:property_id_no,:block_no,:plot_no,:street_name,:owner_name,:owner_type,:owner_geder,:telephone1,:telephone2,:occupancy_type,:any_buildings,:main_use,:parcel_fenced,:size_in_m2,:formal_document,:informal_document,:water,:sewerage,:electricity,:street_lights,:waste_disposal,:shape_length,:shape_area);`,
-        {replacements: {
-            query_type,name,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,formal_document,informal_document,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area}})
-      .then((results) => res.json({ success: true, id: results[0][0].parcel_insert }))
-      .catch((error) => res.status(500).json({ success: false, error }));
+  const {query_type,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,formal_document,informal_document,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area} = req.body;
+  db.sequelize.query(`SELECT * FROM public.parcel_insert (:query_type,:state,:district,:lga,:ward,:address,:property_id_no,:block_no,:plot_no,:street_name,:owner_name,:owner_type,:owner_geder,:telephone1,:telephone2,:occupancy_type,:any_buildings,:main_use,:parcel_fenced,:size_in_m2,:formal_document,:informal_document,:water,:sewerage,:electricity,:street_lights,:waste_disposal,:shape_length,:shape_area);`,
+      {replacements: {
+          query_type,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,formal_document,informal_document,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area}})
+    .then((results) => res.json({ success: true, id: results[0][0].parcel_insert }))
+    .catch((error) => res.status(500).json({ success: false, error }));
   };
 
-  export const getParcels = (req, res) => {
-    const {query_type,id} = req.params;
-    db.sequelize.query(`SELECT * FROM public.get_parcels ('${query_type}','${id}')`)
-      .then((results) => res.json({ success: true, data: results[0] }))
-      .catch((error) => res.status(500).json({ success: false, error }));
+export const getParcels = (req, res) => {
+  const {query_type,id} = req.params;
+        let sql =`SELECT * FROM public.get_parcels('${query_type}','${id}')`
+    if(query_type==='map' || query_type=='maps'){
+    // sql ='SELECT * FROM public.get_parcel_map(:query_type,:id);'
+    sql = "select  * from get_parcel_map('maps','${id}');"
+  }
+  db.sequelize.query(sql)
+    // ,{replacements: {id,query_type}  })
+    .then((results) => res.json({ success: true, data: results[0] }))
+    .catch((error) => res.status(500).json({ success: false, error }));
+};
+  
+export const structureQueries = (req, res) => {
+  let {query_type,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area,parent_id} = req.body;
+  parcel_id = parcel_id>0?parcel_id.toString():null;
+  parent_id= parent_id?parent_id.toString():null
+  db.sequelize.query(`SELECT * FROM public.structure_insert (:query_type,:finished,:level_of_completion,:year_completed,:main_use,:residential_type,:wall_material,:roof_covering,:roof_type,:no_floors,:no_of_occupants,:property_id_no,:parcel_id,:shape_length,:shape_area,:parent_id);`,
+  {
+    replacements:{query_type,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area,parent_id}
+  })
+    .then((results) => res.json({ success: true, results: results[0][0].structure_insert}))
+    .catch((error) => res.status(500).json({ success: false, error }));
+};
+
+export const getStructures = (req, res) => {
+  const {query_type,id} = req.params;
+  db.sequelize.query(`SELECT * FROM public.get_structures ('${query_type}','${id}')`)
+    .then((results) => res.json({ success: true, data: results[0] }))
+    .catch((error) => res.status(500).json({ success: false, error }));
+};
+export const savePolygon = (req, res) => {
+  let  {query_type,file_type,id,polygon,structure_id,parent_id} = req.body;
+
+  console.log({POLYGON:`SELECT * FROM  public.polygon_queries('${query_type}','${file_type}','${id}','${structure_id}','${parent_id?parent_id:``}','${polygon}')`})
+  db.sequelize.query(`SELECT * FROM  public.polygon_queries('${query_type}','${file_type}','${id}','${structure_id}','${parent_id?parent_id:``}','${polygon}')`)
+    .then((results) => res.json({ success: true, data: results[0] }))
+    .catch((error) => res.status(500).json({ success: false, error }));
   };
 
-  export const structureQueries = (req, res) => {
-    const {query_type,finished,level_of_completion,year_completed,main_use,residential_type,wall_material,roof_covering,roof_type,no_floors,no_of_occupants,property_id_no,parcel_id,shape_length,shape_area} = req.body;
-    db.sequelize.query(`SELECT * FROM public.structure_insert ('${query_type}','${finished}','${level_of_completion}','${year_completed}','${main_use}','${residential_type}','${wall_material}','${roof_covering}','${roof_type}','${no_floors}','${no_of_occupants}','${property_id_no}','${parcel_id}','${shape_length}','${shape_area}');`)
-      .then((results) => res.json({ success: true, results: results[0][0].structure_insert}))
-      .catch((error) => res.status(500).json({ success: false, error }));
-  };
-
-  export const getStructures = (req, res) => {
-    const {query_type,id} = req.params;
-    db.sequelize.query(`SELECT * FROM public.get_structures ('${query_type}','${id}')`)
-      .then((results) => res.json({ success: true, data: results[0] }))
-      .catch((error) => res.status(500).json({ success: false, error }));
-  };
-
+export const getPolygons = (req, res)=> {
+  const {query_type,file_type,parcel_id,structure_id} = req.body;
+  db.sequelize.query(`select * from public.get_polygons('${query_type}','${file_type}','${parcel_id}','${structure_id}')`) 
+  .then((results) => res.json({ success: true, row_to_json: results[0][0]}))
+  .catch((error) => res.status(500).json({ success: false, error }));
+};
+//'get/summary-report'
+export const getSummaryReport = (req, res)=> {
+  const {query_type} = req.params;
+  console.log({query_type})
+  let sql = `select * from public.summary_report`
+  if(query_type==='wards'){
+    sql = `select * from public.summary_report2`
+  }
+  db.sequelize.query(sql) 
+  .then((results) => res.json({ success: true, data: results[0]}))
+  .catch((error) => res.status(500).json({ success: false, error }));
+};

@@ -11,16 +11,7 @@ import validateLoginForm from "../validation/login";
 // create user
 const create = (req, res) => {
   const { errors, isValid } = validateRegisterForm(req.body);
-  let {
-    name,
-    email,
-    password,
-    position,
-    accessTo,
-    role,
-    department,
-    accessToDept,
-  } = req.body;
+  let {name,email,password,position,accessTo,role,department,accessToDept} = req.body;
   errors.success = false;
 
   // check validation
@@ -39,16 +30,7 @@ const create = (req, res) => {
           .json({ success: false, msg: "Email already exists!" });
       } else {
         let newUser = {
-          id: null,
-          name,
-          role: role ? role : "",
-          email,
-          password,
-          position,
-          accessTo,
-          department,
-          accessToDept,
-        };
+          id: null,      name,      role: role ? role : "",      email,      password,      position,      accessTo,      department,      accessToDept,    };
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;
@@ -78,9 +60,7 @@ export const verifyUserToken = (req, res, next) => {
   jwt.verify(token, "secret", (err, decoded) => {
     if (err) {
       return res.json({
-        success: false,
-        msg: "Failed to authenticate token." + err,
-      });
+        success: false,    msg: "Failed to authenticate token." + err,  });
     }
 
     const { id } = decoded;
@@ -89,9 +69,7 @@ export const verifyUserToken = (req, res, next) => {
 
     //   .then((user) => {
     //     //   res.json({
-    //     //     success: true,
-    //     //     user,
-    //     //   });
+    //     //     success: true,//     //     user,//     //   });
     //     //
     //     next();
     //   })
@@ -103,9 +81,7 @@ export const verifyUserToken = (req, res, next) => {
         //check for user
         if (user.length) {
           res.json({
-            success: true,
-            user,
-          });
+            success: true,        user,      });
           next();
         }
         return done(null, false);
@@ -160,18 +136,10 @@ const login = (req, res) => {
             // console.log(payload)
 
             jwt.sign(
-              payload,
-              "secret",
-              {
-                expiresIn: 3600,
-              },
-              (err, token) => {
+              payload,          "secret",          {
+                expiresIn: 3600,          },          (err, token) => {
                 res.json({
-                  success: true,
-                  token: "Bearer " + token,
-                  role: user[0].role,
-                  role_id: user[0].role_id,
-                });
+                  success: true,              token: "Bearer " + token,              role: user[0].role,              role_id: user[0].role_id,            });
               }
             );
           } else {
@@ -211,9 +179,7 @@ const profile = (req, res) => {
           .json({ success: false, msg: "Token not matched" });
       } else {
         res.json({
-          success: true,
-          user: user[0],
-        });
+          success: true,      user: user[0],    });
       }
     })
     .catch((err) => {
@@ -255,11 +221,7 @@ const update = (req, res) => {
 
   User.update(
     {
-      firstname,
-      lastname,
-      role,
-    },
-    { where: { id } }
+      firstname,  lastname,  role,},{ where: { id } }
   )
     .then((user) => res.status(200).json({ user }))
     .catch((err) => res.status(500).json({ success: false, msg: err }));
@@ -282,15 +244,7 @@ export const getRole = (req, res) => {
 };
 export const createUser = (req, res) => {
   const {
-    firstname,
-    lastname,
-    username,
-    email,
-    password,
-    role,
-    accessTo,
-    department,
-    position,
+    firstname,lastname,username,email,password,role,accessTo,department,position,
   } = req.body;
   console.log(req.body);
   db.sequelize

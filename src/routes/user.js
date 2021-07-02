@@ -12,8 +12,7 @@ import {
   getRole,
   createUser,
 } from "../controllers/user";
-
-const api = `/api/v1/gis`
+const {api} =config;
 module.exports = (app) => {
   // create a new user
   app.post(

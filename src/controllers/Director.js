@@ -50,16 +50,16 @@ export const createRateCharge = (req, res) => {
 };
 
 export const createDepartment = (req, res) => {
-  const { date, department, description, location } = req.body;
+  const { date, department, name, location } = req.body;
   console.log(req.body);
   db.sequelize
     .query(
-      `INSERT INTO department(department_date,department_code,description,location) 
-      VALUES ('${date}','${department}','${description}','${location}')`
+      `INSERT INTO public."Departments"(code,name,location,"createdAt","updatedAt") 
+      VALUES ('${department}','${description}','${location}','${date}','${date}')`
     )
     .then(() => {
       db.sequelize.query(
-        `INSERT INTO departments_units(department_code,unit_name,unit_location) 
+        `INSERT INTO DepartmentsUnits(code,name,location) 
         VALUES ${req.body.Data.map((a) => "(?)").join(",")}`,
         {
           replacements: req.body.Data,
@@ -75,7 +75,7 @@ export const createDepartmentunit = (req, res) => {
   console.log(data);
   db.sequelize
     .query(
-      `INSERT INTO departments_units(department_code,unit_name,unit_location) 
+      `INSERT INTO public."DepartmentUnits"(code,name,location) 
       VALUES ${data.map((a) => "(?)").join(",")}`,
       {
         replacements: data,
@@ -107,14 +107,14 @@ export const createDirectors = (req, res) => {
 
 export const getDepartment = (req, res) => {
   db.sequelize
-    .query("SELECT department_code FROM department")
+    .query("SELECT code FROM Departments")
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ success: false, error: err }));
 };
 export const getUnit = (req, res) => {
   db.sequelize
     .query(
-      `SELECT unit_name FROM departments_units where department_code='${req.params.department}'`
+      `SELECT unit_name FROM public."DepartmentUnits" where code='${req.params.department}'`
     )
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ success: false, error: err }));
@@ -131,8 +131,8 @@ export const getRegistries = (req, res) => {
 export const makeRecommendation = (req, res) => {
   const {query_type,recom_id,term,status,remark,proposed_dev,annual_rent,dev_charges,survey_charges,proposed_dev_time,id,forward_by,forward_to} = req.body;
   let sql = `CALL recommendation_queries(:query_type,:id,:recom_id,:status,:remark,:term,:proposed_dev,:annual_rent,:dev_charges,:survey_charges,:proposed_dev_time,:forward_by,:forward_to )`;
- console.log({QQQQQQQQQQQWWWWWWWWWWW: `CALL recommendation_queries(${query_type},${id},${recom_id},${status},${remark},${term},${proposed_dev},${annual_rent},${dev_charges},${survey_charges},${proposed_dev_time},${forward_by},${forward_to} )`})
-  db. sequelize.query(sql,{replacements:{query_type,id, recom_id,status,remark,term,proposed_dev,annual_rent,dev_charges,id,survey_charges,proposed_dev_time,forward_by,forward_to }})
+//  console.log({QQQQQQQQQQQWWWWWWWWWWW: `CALL recommendation_queries(${query_type},${id},${recom_id},${status},${remark},${term},${proposed_dev},${annual_rent},${dev_charges},${survey_charges},${proposed_dev_time},${forward_by},${forward_to} )`})
+    db. sequelize.query(sql,{replacements:{query_type,id, recom_id,status,remark,term,proposed_dev,annual_rent,dev_charges,id,survey_charges,proposed_dev_time:proposed_dev_time,forward_by,forward_to }})
   .then((result) =>res.json({ success: true, result }))
   .catch((error) =>res.status(500).json({ success: false, error }));
 };
@@ -204,7 +204,7 @@ export const getRecommendation = (req, res) => {
 
 export const getDepartmentUnit = (req, res) => {
   db.sequelize
-    .query("SELECT * FROM departments_units")
+    .query(`SELECT * FROM public."DepartmentUnits"`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ success: false, error: err }));
 };
@@ -322,15 +322,15 @@ export const getImageRemark = (req, res) => {
 export const getDepartment_Position = (req, res) => {
   const { id } = req.params;
   db.sequelize
-    .query(`call get_department_position()`)
-    .then((results) => res.json({ success: true, results: results[0] }))
+    .query(`select name as position from public."DepartmentUnits"`)
+    .then((results) => res.json({ success: true, data: results[0]}))
     .catch((err) => res.status(500).json({ success: false, error: err }));
 };
 
 export const getRoles = (req, res) => {
   // const { id } = req.user.id;
   db.sequelize
-    .query(`SELECT role FROM public."Users" `)
+    .query(`SELECT  distinct forward_by as role FROM public."Remarks" group by (role) order by role`)
     .then((data) => {
       res.json({ success: true, data:data[0]});
     })

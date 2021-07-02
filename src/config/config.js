@@ -1,4 +1,5 @@
 var config = module.exports;
+config.api = `/api/v1/gis`;
 
 const userRoles = config.userRoles = {
     guest: 1,       
@@ -12,4 +13,4 @@ config.accessLevels = {
     user: userRoles.user | userRoles.admin | userRoles.superAdmin,                    
     admin: userRoles.admin | userRoles.superAdmin,                                    
     superAdmin: userRoles.superAdmin,                                                 
-}
+};
