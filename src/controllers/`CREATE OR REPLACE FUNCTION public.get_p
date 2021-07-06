@@ -1,0 +1,36 @@
+CREATE OR REPLACE FUNCTION public.get_parcels(
+	in_query_type character varying,
+	in_id character varying)
+    RETURNS TABLE(id integer ,structures bigint, geom  character varying, property_id_no numeric, owner_gender character varying, owner_type character varying, telephone1 character varying, telephone2 character varying, any_buildings character varying, parcel_fenced character varying, main_use character varying, water character varying, electricity character varying, street_lights character varying, waste_disposal character varying, sewerages character varying, name_of_occupier character varying, type_of_occupier character varying, occupied character varying, state character varying, lga character varying, ward character varying, district character varying, plot_no character varying, block_no character varying, address character varying, status character varying, wall_materials character varying, roof_cover character varying, roof_type character varying, no_of_floors character varying, no_of_occupiers character varying, captured_by character varying, captured_at character varying, doc_type character varying, owner_name character varying) 
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+AS $BODY$
+DECLARE keyword VARCHAR;
+BEGIN  keyword:= CONCAT('%',in_id,'%');
+		IF in_query_type='one' THEN 
+		RETURN QUERY
+        SELECT * FROM public.parcels p WHERE p.id = in_id ::INTEGER LIMIT 1;
+    ELSIF in_query_type ='delete' THEN 
+		DELETE FROM public.parcels WHERE id =in_id ::INTEGER;
+		RETURN QUERY
+        SELECT p.id,(select count(ps.id) from public.parcel_structures ps where ps.parcel_id=p.id) as structures,	
+		ST_AsText(p.geom), p.fid_1, p.property_id_no, p.owner_gender, p.owner_type, p.telephone1, p.telephone2, p.any_buildings, p.parcel_fenced, p.main_use, p.water, p.electricity, p.street_lights, p.waste_disposal, p.sewerages, p.name_of_occupier, p.type_of_occupier, p.occupied, p.state, p.lga, p.ward, p.district, p.plot_no, p.block_no, p.address, p.status, p.wall_materials, p.roof_cover, p.roof_type, p.no_of_floors, p.no_of_occupiers, p.captured_by, p.captured_at, p.doc_type, p.owner_name
+        from public.parcels p ORDER BY ID DESC LIMIT 100;
+	ELSIF in_query_type ='search' THEN 
+    	RETURN QUERY
+       	SELECT p.id, (select distinct oid from gis_kn kn where kn.oid=p.id) as polygon_id,(select count(ps.id) from public.parcel_structures ps where ps.parcel_id=p.id) as structures,
+        p.state,p.district,p.lga,p.ward,p.address,p.property_id_no,p.block_no,p.plot_no,p.street_name,p.owner_name,p.owner_type,p.owner_geder,p.telephone1,p.telephone2,p.occupancy_type,p.any_buildings,p.main_use,p.parcel_fenced,p.size_in_m2,p.formal_document,p.informal_document,p.water,p.sewerage,p.electricity,p.street_lights,p.waste_disposal,p.shape_length,p.shape_area,p."createdAt",p."updatedAt"
+        FROM public.parcels P WHERE p.district ILIKE keyword OR p.lga ILIKE keyword OR p.ward ILIKE keyword OR p.address ILIKE keyword OR p.block_no ILIKE keyword OR p.property_id_no ILIKE keyword OR p.plot_no ILIKE keyword  OR p.street_name ILIKE keyword  OR p.owner_name ILIKE keyword  OR p.owner_type ILIKE keyword OR p.owner_geder ILIKE keyword OR p.telephone1 ILIKE keyword OR p.telephone2 ILIKE keyword OR p.occupancy_type ILIKE keyword  OR p.any_buildings ILIKE keyword  OR p.main_use ILIKE keyword  OR p.parcel_fenced ILIKE keyword  OR p.size_in_m2 ILIKE keyword  OR p.formal_document ILIKE keyword OR p.informal_document ILIKE keyword OR p.water ILIKE keyword OR p.sewerage ILIKE keyword OR p.electricity ILIKE keyword OR p.street_lights ILIKE keyword OR p.waste_disposal ILIKE keyword OR p.shape_length ILIKE keyword OR p.shape_area ILIKE keyword ORDER BY id DESC LIMIT 20;
+	ELSE
+		RETURN QUERY
+		 SELECT p.id,(select count(ps.id) from public.parcel_structures ps where ps.parcel_id=p.id) as structures,	
+		ST_AsText(p.geom), p.fid_1, p.property_id_no, p.owner_gender, p.owner_type, p.telephone1, p.telephone2, p.any_buildings, p.parcel_fenced, p.main_use, p.water, p.electricity, p.street_lights, p.waste_disposal, p.sewerages, p.name_of_occupier, p.type_of_occupier, p.occupied, p.state, p.lga, p.ward, p.district, p.plot_no, p.block_no, p.address, p.status, p.wall_materials, p.roof_cover, p.roof_type, p.no_of_floors, p.no_of_occupiers, p.captured_by, p.captured_at, p.doc_type, p.owner_name
+        from public.parcels p ORDER BY ID DESC LIMIT 100;
+    END IF;
+END;
+$BODY$;
+
+ALTER FUNCTION public.get_parcels(character varying, character varying)
+    OWNER TO postgres;
