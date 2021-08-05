@@ -75,6 +75,6 @@ Object.keys(db).forEach(function (modelName) {
 });
 
 db.sequelize = sequelize;
-db.Sequelize = _sequelize2.default;
+// db.Sequelize = Sequelize;
 
 exports.default = db;

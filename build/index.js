@@ -32,7 +32,7 @@ var app = (0, _express2.default)();
 
 app.use(_bodyParser2.default.json());
 
-var port = process.env.PORT || 8005; // set the view engine to ejs
+var port = process.env.PORT || 8080; // set the view engine to ejs
 app.set("view engine", "ejs");
 
 // make express look in the public directory for assets (css/js/img)
