@@ -136,22 +136,6 @@ app.post("/api/surveyor/images/upload", _multer.surveyor.array("image"), functio
   });
 });
 
-// app.post("/api/image/upload", async (req, res) => {
-//   try {
-//     const image = req.body;
-//     console.log(image);
-//     const uploadedReponse = await cloudinary.uploader.upload(`${image}`, {
-//       upload_preset: "myimage",
-//     });
-//     console.log(uploadedReponse);
-//     res.json({ msg: "uploaded" });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ msg: "not uploaded" });
-//   }
-// });
-
-//create a server
 var server = app.listen(port, function () {
   var host = server.address().address;
   var port = server.address().port;

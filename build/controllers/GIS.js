@@ -9,16 +9,11 @@ var _models = require("../models");
 
 var _models2 = _interopRequireDefault(_models);
 
-var _moment = require("moment");
-
-var _moment2 = _interopRequireDefault(_moment);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var occupantQueries = exports.occupantQueries = function occupantQueries(req, res) {
   var _req$body = req.body,
       query_type = _req$body.query_type,
-      occupant_id = _req$body.occupant_id,
       floor_area_m2 = _req$body.floor_area_m2,
       name_of_occupant = _req$body.name_of_occupant,
       type_of_occupant = _req$body.type_of_occupant,
@@ -70,8 +65,7 @@ var parcelQueries = exports.parcelQueries = function parcelQueries(req, res) {
       main_use = _req$body2.main_use,
       parcel_fenced = _req$body2.parcel_fenced,
       size_in_m2 = _req$body2.size_in_m2,
-      formal_document = _req$body2.formal_document,
-      informal_document = _req$body2.informal_document,
+      doc_type = _req$body2.doc_type,
       water = _req$body2.water,
       sewerage = _req$body2.sewerage,
       electricity = _req$body2.electricity,
@@ -80,8 +74,7 @@ var parcelQueries = exports.parcelQueries = function parcelQueries(req, res) {
       shape_length = _req$body2.shape_length,
       shape_area = _req$body2.shape_area;
 
-  _models2.default.sequelize.query("SELECT * FROM public.parcel_insert (:query_type,:state,:district,:lga,:ward,:address,:property_id_no,:block_no,:plot_no,:street_name,:owner_name,:owner_type,:owner_geder,:telephone1,:telephone2,:occupancy_type,:any_buildings,:main_use,:parcel_fenced,:size_in_m2,:formal_document,:informal_document,:water,:sewerage,:electricity,:street_lights,:waste_disposal,:shape_length,:shape_area);", { replacements: {
-      query_type: query_type, state: state, district: district, lga: lga, ward: ward, address: address, property_id_no: property_id_no, block_no: block_no, plot_no: plot_no, street_name: street_name, owner_name: owner_name, owner_type: owner_type, owner_geder: owner_geder, telephone1: telephone1, telephone2: telephone2, occupancy_type: occupancy_type, any_buildings: any_buildings, main_use: main_use, parcel_fenced: parcel_fenced, size_in_m2: size_in_m2, formal_document: formal_document, informal_document: informal_document, water: water, sewerage: sewerage, electricity: electricity, street_lights: street_lights, waste_disposal: waste_disposal, shape_length: shape_length, shape_area: shape_area } }).then(function (results) {
+  _models2.default.sequelize.query("SELECT * FROM public.parcel_insert ('" + query_type + "','" + state + "','" + district + "','" + lga + "','" + ward + "','" + address + "','" + property_id_no + "','" + block_no + "','" + plot_no + "','" + street_name + "','" + owner_name + "','" + owner_type + "','" + owner_geder + "','" + telephone1 + "','" + telephone2 + "','" + occupancy_type + "','" + any_buildings + "','" + main_use + "','" + parcel_fenced + "','" + size_in_m2 + "','" + doc_type + "','" + water + "','" + sewerage + "','" + electricity + "','" + street_lights + "','" + waste_disposal + "','" + shape_length + "','" + shape_area + "')").then(function (results) {
     return res.json({ success: true, id: results[0][0].parcel_insert });
   }).catch(function (error) {
     return res.status(500).json({ success: false, error: error });
@@ -93,12 +86,7 @@ var getParcels = exports.getParcels = function getParcels(req, res) {
       query_type = _req$params2.query_type,
       id = _req$params2.id;
 
-  var sql = "SELECT * FROM public.get_parcels('" + query_type + "','" + id + "')";
-  if (query_type === 'map' || query_type == 'maps') {
-    // sql ='SELECT * FROM public.get_parcel_map(:query_type,:id);'
-    sql = "select  * from get_parcel_map('maps','${id}');";
-  }
-  _models2.default.sequelize.query(sql)
+  _models2.default.sequelize.query("SELECT * FROM public.get_parcels('" + query_type + "','" + id + "')")
   // ,{replacements: {id,query_type}  })
   .then(function (results) {
     return res.json({ success: true, data: results[0] });

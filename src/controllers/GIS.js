@@ -1,6 +1,6 @@
 import db from "../models";
 export const occupantQueries = (req, res) => {
-  const {query_type,occupant_id,floor_area_m2,name_of_occupant,type_of_occupant,use_type_of_unit,occupier_is_owner,owner_details,tel_mobile,tel_home,parcel_id,structure_id} = req.body;
+  const {query_type,floor_area_m2,name_of_occupant,type_of_occupant,use_type_of_unit,occupier_is_owner,owner_details,tel_mobile,tel_home,parcel_id,structure_id} = req.body;
   db.sequelize.query
   (`SELECT * FROM  public.occupant_insert('${query_type}','${floor_area_m2}','${name_of_occupant}','${type_of_occupant}','${use_type_of_unit}','${occupier_is_owner}','${owner_details}','${tel_mobile}','${tel_home}','${structure_id}','${parcel_id}')`)
     .then((results) => res.json({ success: true, id: results[0][0].occupant_insert }))
@@ -15,21 +15,14 @@ export const getOccupants = (req, res) => {
 
 export const parcelQueries = (req, res) => {
   const {query_type,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,doc_type,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area} = req.body;
-  db.sequelize.query(`SELECT * FROM public.parcel_insert (:query_type,:state,:district,:lga,:ward,:address,:property_id_no,:block_no,:plot_no,:street_name,:owner_name,:owner_type,:owner_geder,:telephone1,:telephone2,:occupancy_type,:any_buildings,:main_use,:parcel_fenced,:size_in_m2,:doc_type,:water,:sewerage,:electricity,:street_lights,:waste_disposal,:shape_length,:shape_area);`,
-      {replacements: {
-          query_type,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,doc_type,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area}})
-    .then((results) => res.json({ success: true, id: results[0][0].parcel_insert }))
-    .catch((error) => res.status(500).json({ success: false, error }));
+  db.sequelize.query(`SELECT * FROM public.parcel_insert ('${query_type}','${state}','${district}','${lga}','${ward}','${address}','${property_id_no}','${block_no}','${plot_no}','${street_name}','${owner_name}','${owner_type}','${owner_geder}','${telephone1}','${telephone2}','${occupancy_type}','${any_buildings}','${main_use}','${parcel_fenced}','${size_in_m2}','${doc_type}','${water}','${sewerage}','${electricity}','${street_lights}','${waste_disposal}','${shape_length}','${shape_area}')`)
+  .then((results) => res.json({ success: true, id: results[0][0].parcel_insert }))
+  .catch((error) => res.status(500).json({ success: false, error }));
   };
 
 export const getParcels = (req, res) => {
   const {query_type,id} = req.params;
-        let sql =`SELECT * FROM public.get_parcels('${query_type}','${id}')`
-    if(query_type==='map' || query_type=='maps'){
-    // sql ='SELECT * FROM public.get_parcel_map(:query_type,:id);'
-    sql = "select  * from get_parcel_map('maps','${id}');"
-  }
-  db.sequelize.query(sql)
+  db.sequelize.query(`SELECT * FROM public.get_parcels('${query_type}','${id}')`)
     // ,{replacements: {id,query_type}  })
     .then((results) => res.json({ success: true, data: results[0] }))
     .catch((error) => res.status(500).json({ success: false, error }));

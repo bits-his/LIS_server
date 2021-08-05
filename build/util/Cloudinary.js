@@ -5,6 +5,7 @@ var _config = require('../config/config');
 require('dotenv').config;
 
 var cloudinary = require('cloudinary').v2;
+
 cloudinary.config({
   cloud_name: 'drxkp1erj',
   api_key: '218187136849528',
@@ -12,19 +13,18 @@ cloudinary.config({
 });
 
 var cloudRoute = function cloudRoute(app) {
-  // app.post(`${api}/cloud/upload`, async (req, res) => {
-  //   try {
-  //     const image = req.body;
-  //     console.log(image);
-  //     const uploadedReponse = await cloudinary.uploader.upload(`${image}`, {
-  //       upload_preset: "myimage",
-  //     });
-  //     console.log(uploadedReponse);
-  //     res.json({ msg: "uploaded" });
-  //   } catch (error) {
-  //     console.log(error);
-  //     res.status(500).json({ msg: "not uploaded" });
-  //   }
-  // });
+  app.post(_config.api + '/cloud/upload', function (req, res) {
+    var image = req.body;
+    console.log(image);
+    cloudinary.uploader.upload('' + image, {
+      upload_preset: "myimage"
+    }).then(function (uploadedReponse) {
+      res.json({ success: true, msg: "Done " + uploadedReponse });
+    }).catch(function (error) {
+      console.log(error);
+      res.status(500).json({ msg: "Error :" + error });
+    });
+  });
 };
+
 module.exports = { cloudinary: cloudinary, cloudRoute: cloudRoute };
