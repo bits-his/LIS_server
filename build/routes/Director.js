@@ -17,6 +17,9 @@ var api = _config2.default.api;
 
 
 module.exports = function (app) {
+  app.get(api + "/", function (req, res) {
+    res.json('Hello');
+  });
   app.post(api + "/registry/create", _Director.createRegistry);
   app.get(api + "/use/rate/cat", _Director.getUseRateCat);
   app.get(api + "/get/review/range", _Director.getReviewRange);

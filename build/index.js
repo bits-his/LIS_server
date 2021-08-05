@@ -20,10 +20,10 @@ var _models = require("./models");
 
 var _models2 = _interopRequireDefault(_models);
 
-var _multer = require("../config/multer");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// import { profileStorage, uploadLetter, surveyor } from "../config/multer";
+// import db from "./models";
 // const cloudinary = require('cloudinary');
 var _require = require("./util/Cloudinary"),
     cloudRoute = _require.cloudRoute;
