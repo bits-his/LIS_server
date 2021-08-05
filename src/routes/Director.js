@@ -45,6 +45,9 @@ import {
 const {api} =config;
 
 module.exports = (app) => {
+  app.get(`${api}/`, (req,res)=>{
+    res.json('Hello')
+  });
   app.post(`${api}/registry/create`, createRegistry);
   app.get(`${api}/use/rate/cat`, getUseRateCat);
   app.get(`${api}/get/review/range`, getReviewRange);
