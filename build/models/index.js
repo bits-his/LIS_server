@@ -22,25 +22,9 @@ require("dotenv").config();
 var env = process.env.NODE_ENV || 'development';
 var basename = _path2.default.basename(__filename);
 var config = require(__dirname + '/../config/pgdb.js')[env];
-// const config = {
-//   username: "hceklbkaubkzja",
-//   password: "7bf0e13875c36a4aeb27017bffa7972f166a9fdc4f4ee77b3c3eefdd28ab1852",
-//   database: "dalj224b0epnff",
-//   host: "ec2-34-193-112-164.compute-1.amazonaws.com",
-//   ssl:true,
-//   dialect: "postgres",
-//   url:'postgres://hceklbkaubkzja:7bf0e13875c36a4aeb27017bffa7972f166a9fdc4f4ee77b3c3eefdd28ab1852@ec2-34-193-112-164.compute-1.amazonaws.com:5432/dalj224b0epnff',
-//   //URL.parse('ec2-34-193-112-164.compute-1.amazonaws.com', true).pathname,
-//   pool: {
-//     max: 5, 
-//     min: 0,
-//     acquire: 30000,
-//     idle: 10000,
-//   },
-//   use_env_variable:false
-// };
+
 var db = {};
-var use_query_string = false;
+var use_query_string = true;
 var sequelize = void 0;
 if (config.use_env_variable) {
   sequelize = new _sequelize2.default(process.env[config.use_env_variable], config);
@@ -60,7 +44,6 @@ if (config.use_env_variable) {
     ssl: config.ssl
   });
 }
-// sequelize = new Sequelize('postgres://hceklbkaubkzja:7bf0e13875c36a4aeb27017bffa7972f166a9fdc4f4ee77b3c3eefdd28ab1852@ec2-34-193-112-164.compute-1.amazonaws.com:5432/dalj224b0epnff');
 _fs2.default.readdirSync(__dirname).filter(function (file) {
   return file.indexOf(".") !== 0 && file !== basename && file.slice(-3) === ".js";
 }).forEach(function (file) {
