@@ -1,16 +1,15 @@
 import express from "express";
 import passport from "passport";
-import bodyParser from "body-parser";
 import cors from "cors";
 import models from "./models";
-import { profileStorage, uploadLetter, surveyor } from "../config/multer";
-import db from "./models";
+// import { profileStorage, uploadLetter, surveyor } from "../config/multer";
+// import db from "./models";
 // const cloudinary = require('cloudinary');
 const { cloudRoute } = require("./util/Cloudinary");
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 
 let port = process.env.PORT || 8005; // set the view engine to ejs
 app.set("view engine", "ejs");

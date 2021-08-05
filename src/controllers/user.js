@@ -96,65 +96,66 @@ export const verifyUserToken = (req, res, next) => {
 const login = (req, res) => {
   const { errors, isValid } = validateLoginForm(req.body);
 
-  // check validation
-  if (!isValid) {
-    return res
-      .status(400)
-      .json({ success: false, error: errors, msg: "Fields are required" });
-  }
+  // // check validation
+  // if (!isValid) {
+  //   return res
+  //     .status(400)
+  //     .json({ success: false, error: errors, msg: "Fields are required" });
+  // }
 
   const { email, password } = req.body;
+  res.json({DD:req.body})
 
   // User.findAll({
   //   where: {
   //     email,
   //   },
   // })
-  db.sequelize
-    .query(`SELECT * FROM public."Users" WHERE email='${email}'`)
-    .then((found) => {
-      let user = found[0];
-      console.log(user);
-      //check for user
-      if (!user.length) {
-        errors.success = false;
-        errors.msg = "User not found!";
-        return res.status(404).json(errors);
-      }
+  // db.sequelize
+  //   .query(`SELECT * FROM public."Users" WHERE email='${email}'`)
+  //   .then((found) => {
+  //     let user = found[0];
+  //     console.log(user);
+  //     //check for user
+  //     if (!user.length) {
+  //       errors.success = false;
+  //       errors.msg = "User not found!";
+  //       return res.status(404).json(errors);
+  //     }
 
-      let originalPassword = user[0].password;
+  //     let originalPassword = user[0].password;
 
-      //check for password
-      bcrypt
-        .compare(password, originalPassword)
-        .then((isMatch) => {
-          if (isMatch) {
-            // user matched
-            console.log("matched!");
-            const { id, role, role_id } = user[0];
-            const payload = { id, role, role_id }; //jwt payload
-            // console.log(payload)
+  //     //check for password
+  //     bcrypt
+  //       .compare(password, originalPassword)
+  //       .then((isMatch) => {
+  //         if (isMatch) {
+  //           // user matched
+  //           console.log("matched!");
+  //           const { id, role, role_id } = user[0];
+  //           const payload = { id, role, role_id }; //jwt payload
+  //           // console.log(payload)
 
-            jwt.sign(
-              payload,          "secret",          {
-                expiresIn: 3600,          },          (err, token) => {
-                res.json({
-                  success: true,              token: "Bearer " + token,              role: user[0].role,              role_id: user[0].role_id,            });
-              }
-            );
-          } else {
-            errors.msg = "Password not correct";
-            errors.success = false;
-            console.log(errors);
-            return res.status(400).json(errors);
-          }
-        })
-        .catch((err) => res.status(500).json({ success: false, msg: err }));
-    })
-    .catch((err) => {
-      res.status(500).json({ success: false, msg: err });
-      console.log(err);
-    });
+  //           jwt.sign(
+  //             payload,          "secret",          {
+  //               expiresIn: 3600,          },          (err, token) => {
+  //               res.json({
+  //                 success: true,              token: "Bearer " + token,              role: user[0].role,              role_id: user[0].role_id,            });
+  //             }
+  //           );
+  //         } else {
+  //           errors.msg = "Password not correct";
+  //           errors.success = false;
+  //           console.log(errors);
+  //           return res.status(400).json(errors);
+  //         }
+  //       })
+  //       .catch((err) => res.status(500).json({ success: false, msg: err }));
+  //   })
+  //   .catch((err) => {
+  //     res.status(500).json({ success: false, msg: err });
+  //     console.log(err);
+  //   });
 };
 
 // profile
