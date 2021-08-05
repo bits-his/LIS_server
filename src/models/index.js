@@ -44,7 +44,7 @@ if (config.use_env_variable) {
     config.password,{
         url:config.url,
         host:config.host,
-        dialect:config.db_dialect,
+        dialect:config.dialect,
         ssl:config.ssl
     }
   );
