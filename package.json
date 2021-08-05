@@ -1,10 +1,10 @@
 {
   "name": "express-land-info-services",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
     "clean": "rm -rf build && mkdir build",
-    "dev": "nodemon --exec babel-node src/server.js",
+    "dev": "nodemon --exec babel-node src/index.js",
     "build-server": "babel -d ./build ./src --copy-files",
     "build": "npm run clean && npm run build-server",
     "start": "node ./build/index.js",
