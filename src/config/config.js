@@ -1,7 +1,7 @@
 var config = module.exports;
-// config.api = `/api/v1/gis`;
+config.api = `/api/v1/gis`;
 
-config.api = ``;
+// config.api = ``;
 
 const userRoles = config.userRoles = {
     guest: 1,       
