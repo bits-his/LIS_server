@@ -1,7 +1,8 @@
-var config = module.exports;
-config.api = `/api/v1/gis`;
 
-// config.api = ``;
+require("dotenv").config();
+const config = module.exports;
+const env = process.env.NODE_ENV || 'development';
+config.api = env==='development'? `/api/v1/gis`:'';
 
 const userRoles = config.userRoles = {
     guest: 1,       
