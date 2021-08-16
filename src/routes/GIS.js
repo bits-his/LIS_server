@@ -24,5 +24,5 @@ module.exports = (app) => {
   app.get(`${api}/get/parcels/:query_type/:id`,getParcels);
   app.get(`${api}/get/occupants/:query_type/:id`,getOccupants);
   app.get(`${api}/get/structures/:query_type/:id`,getStructures);
-  app.get(`${api}/get/summary-report/:query_type?`,veryfyJwt, getSummaryReport);
+  app.get(`${api}/get/summary-report/:query_type?`, getSummaryReport);
 }
