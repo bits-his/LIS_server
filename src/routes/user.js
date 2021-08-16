@@ -83,6 +83,6 @@ module.exports = (app) => {
     createUser
   );
   app.get('*', function(req, res){
-    res.send('Page not found!');
+    res.send('Page not found!',404);
   });
 };

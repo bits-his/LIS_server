@@ -1,9 +1,9 @@
-"use strict";
+'use strict';
 
+require("dotenv").config();
 var config = module.exports;
-// config.api = `/api/v1/gis`;
-
-config.api = "";
+var env = process.env.NODE_ENV || 'development';
+config.api = env === 'development' ? '/api/v1/gis' : '';
 
 var userRoles = config.userRoles = {
     guest: 1,

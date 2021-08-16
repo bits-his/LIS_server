@@ -56,4 +56,7 @@ module.exports = function (app) {
   app.post(api + "/create/user", _passport2.default.authenticate("jwt", {
     session: false
   }), _user.createUser);
+  app.get('*', function (req, res) {
+    res.send('Page not found!', 404);
+  });
 };
