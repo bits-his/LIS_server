@@ -1,6 +1,6 @@
-import passport from "passport";
+// import passport from "passport";
 import config from "../config/config";
-const veryfyJwt = passport.authenticate("jwt", { session: false });
+// const veryfyJwt = passport.authenticate("jwt", { session: false });
 
 const {api} = config;
 import {

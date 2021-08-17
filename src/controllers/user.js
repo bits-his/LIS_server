@@ -192,10 +192,10 @@ const findAllUsers = (req, res) => {
   // User.findAll()
   db.sequelize
     .query(`SELECT * FROM  public."Users" `)
-    .then((user) => {
-      res.json({ user });
+    .then((users) => {
+      res.json({ users:users[0], success:true });
     })
-    .catch((err) => res.status(500).json({ success: false, msg: err }));
+    .catch((error) => res.status(500).json({ success: false, error }));
 };
 
 // fetch user by userId

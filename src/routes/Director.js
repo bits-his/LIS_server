@@ -7,7 +7,7 @@ import {
   createSiteFile,
   createLetterTemplate,
   createDepartment,
-  getDepartment,
+  getDepartments,
   createDirectors,
   getRegistries,
   getRemark,
@@ -23,7 +23,6 @@ import {
   getUseRateCat,
   getReviewRange,
   getGroundRent,
-  getMailTable,
   getImagesURL,
   getImageRemark,
   getDepartment_Position,
@@ -59,7 +58,7 @@ module.exports = (app) => {
   // app.post('/api/departmentunit/create', createDepartmentunit);
   app.post(`${api}/department/create`, createDepartment);
   app.post(`${api}/directors/create`, createDirectors);
-  app.get(`${api}/get/department`, getDepartment);
+  app.get(`${api}/get/departments`, getDepartments);
   app.get(`${api}/get/registry/role/:role`, veryfyJwt, getRegistries);
   app.get(`${api}/get/remarks/:query_type/:role`, veryfyJwt, getRemarks);
   app.get(`${api}/get/remark/:query_type/:id`, veryfyJwt, getRemark);

@@ -37,7 +37,7 @@ module.exports = (app) => {
     passport.authenticate("jwt", {
       session: false,
     }),
-    allowOnly(config.accessLevels.admin, findAllUsers)
+    findAllUsers
   );
 
   // retrieve user by id
