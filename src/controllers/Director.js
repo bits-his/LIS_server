@@ -107,19 +107,23 @@ export const createDirectors = (req, res) => {
 
 export const getDepartments = (req, res) => {
   db.sequelize
-    .query(`SELECT code FROM public."Departments"`)
+    .query(`SELECT distinct (department_code) as code FROM public.departments_units order by department_code`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ success: false, error: err }));
 };
 export const getUnit = (req, res) => {
+  const { department } = req.params;
   db.sequelize
-    .query(
-      `SELECT unit_name FROM public."DepartmentUnits" where code='${req.params.department}'`
-    )
+    .query(`SELECT distinct (unit_name) as unit FROM public.departments_units where department_code='${department}' order by unit_name`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ success: false, error: err }));
 };
-
+export const getRoutes = (req, res) => {
+  db.sequelize
+    .query(`SELECT route FROM public."RouteAccess"`)
+    .then((results) => res.json({ success: true, results: results[0] }))
+    .catch((err) => res.status(500).json({ success: false, error: err }));
+};
 export const getRegistries = (req, res) => {
   let { role, status } = req.params;
   const sql = `SELECT * from get_files (:role, :status)`;

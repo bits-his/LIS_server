@@ -28,6 +28,7 @@ import {
   getDepartment_Position,
   getRoles,
   getUnit,
+  getRoutes,
   directorLand,
   updateFileNumber,
   get_file_number,
@@ -73,7 +74,8 @@ module.exports = (app) => {
   app.get(`${api}/get/letter/template/name`, getLetterTemplateName);
   app.get(`${api}/get/letter/body/:letter`, getLetterBody);
   app.get(`${api}/get/groundrent/:land/:range`, getGroundRent);
-  app.get(`${api}/get/unit/:department`, getUnit);
+  app.get(`${api}/get-unit/:department`, getUnit);
+  app.get(`${api}/get-routes/`, getRoutes);
   app.get(`${api}/get/file/number`, get_file_number);
   app.post(`${api}/update/file/number`, updateFileNumber);
   app.get(`${api}/get/recomendation/:user`, get_recommendation);
