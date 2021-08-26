@@ -14,9 +14,17 @@ export const getOccupants = (req, res) => {
 };
 
 export const parcelQueries = (req, res) => {
-  const {query_type,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,doc_type,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area} = req.body;
+  const {query_type,state,district,lga,ward,address,property_id_no,block_no,plot_no,street_name,owner_name,owner_type,owner_geder,telephone1,telephone2,occupancy_type,any_buildings,main_use,parcel_fenced,size_in_m2,doc_type,water,sewerage,electricity,street_lights,waste_disposal,shape_length,shape_area,geom} = req.body;
   db.sequelize.query(`SELECT * FROM public.parcel_insert ('${query_type}','${state}','${district}','${lga}','${ward}','${address}','${property_id_no}','${block_no}','${plot_no}','${street_name}','${owner_name}','${owner_type}','${owner_geder}','${telephone1}','${telephone2}','${occupancy_type}','${any_buildings}','${main_use}','${parcel_fenced}','${size_in_m2}','${doc_type}','${water}','${sewerage}','${electricity}','${street_lights}','${waste_disposal}','${shape_length}','${shape_area}')`)
-  .then((results) => res.json({ success: true, id: results[0][0].parcel_insert }))
+  .then((results) =>{
+    const id =  results[0][0].parcel_insert>0?results[0][0].parcel_insert:0;
+     res.json({ success: true, id })
+    if(id>0 && geom.length>20){
+      db.sequelize.query(`SELECT * FROM  public.polygon_queries('${query_type}','parcel','${id}','0','','${geom}')`)
+    .then((results) => console.log({ success: true, data: results[0] }))
+    .catch((error) => console.log({ success: false, error }));
+    }
+  })
   .catch((error) => res.status(500).json({ success: false, error }));
   };
 
