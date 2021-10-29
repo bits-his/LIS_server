@@ -64,9 +64,11 @@ export const savePolygon = (req, res) => {
   };
 
 export const getPolygons = (req, res)=> {
-  const {query_type,file_type,parcel_id,structure_id} = req.body;
+  const {query_type,file_type,parcel_id='',structure_id=''} = req.body;
   db.sequelize.query(`select * from public.get_polygons('${query_type}','${file_type}','${parcel_id}','${structure_id}')`) 
-  .then((results) => res.json({ success: true, row_to_json: results[0][0]}))
+  .then((results) =>{ 
+    console.log(results)
+    res.json({ success: true, row_to_json: results[0][0]})})
   .catch((error) => res.status(500).json({ success: false, error }));
 };
 //'get/summary-report'

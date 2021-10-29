@@ -9,7 +9,7 @@ const basename = path.basename(__filename);
 const config = require(__dirname + '/../config/pgdb.js')[env];
 
 const db = {};
-const use_query_string = true;
+const use_query_string = false;
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
