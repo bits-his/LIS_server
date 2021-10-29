@@ -12,7 +12,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-let port =  8080; // set the view engine to ejs
+let port = process.env.APP_PORT || 8080; // set the view engine to ejs
 app.set("view engine", "ejs");
 
 // make express look in the public directory for assets (css/js/img)
@@ -38,8 +38,6 @@ cloudRoute(app);
 // passport config
 require("./config/passport")(passport);
 //create a server
-var server = app.listen(port, function () {
-  const serverObj = server.address();
-  var port = serverObj.port;
+app.listen(port, function () {
   console.log(`App listening at http://localhost:${port}`);
 });
