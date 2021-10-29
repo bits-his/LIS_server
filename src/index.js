@@ -12,7 +12,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-let port = process.env.APP_PORT || 8080; // set the view engine to ejs
+let port =  8080; // set the view engine to ejs
 app.set("view engine", "ejs");
 
 // make express look in the public directory for assets (css/js/img)
