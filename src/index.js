@@ -11,7 +11,7 @@ const app = express();
 
 app.use(express.json({limit:'50mb', extended: true, parameterLimit: 50000 }));
 
-let port = process.env.APP_PORT || 8080; // set the view engine to ejs
+let port = process.env.APP_PORT || 8012; // set the view engine to ejs
 app.set("view engine", "ejs");
 
 // make express look in the public directory for assets (css/js/img)
