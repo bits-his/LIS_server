@@ -26,7 +26,7 @@ export const parcelQueries = (req, res) => {
   // }else{
     let {query_type, state='Kano', district='', lga='', ward='', address='', property_id_no='', block_no='', plot_no='', street_name='', owner_name='', owner_type='', owner_geder='', telephone1='', telephone2='', occupancy_type='', any_buildings='', main_use='', parcel_fenced='', size_in_m2='', doc_type='', water='', sewerage='', electricity='', street_lights='', waste_disposal='', geom='', id='' } = req.body;
   
-  let sql =`SELECT * FROM public.__parcel_insert ('${query_type}','${state}','${district?district.replace(/'/g,'’'):''}','${lga}','${ward?ward.replace(/'/g,'’'):''}','${address?address.replace(/'/g,'’'):''}','${property_id_no}','${block_no}','${plot_no}','${street_name?street_name.replace(/'/g,'’'):''}','${owner_name?owner_name.replace(/'/g,'’'):''}','${owner_type}','${owner_geder}','${telephone1}','${telephone2}','${occupancy_type}','${any_buildings}','${main_use}','${parcel_fenced}','${size_in_m2}','${doc_type}','${water}','${sewerage}','${electricity}','${street_lights}','${waste_disposal}','${geom}','${id}')`
+  let sql =`SELECT * FROM public.__parcel_insert_fresh('${query_type}','${state}','${district?district.replace(/'/g,'’'):''}','${lga}','${ward?ward.replace(/'/g,'’'):''}','${address?address.replace(/'/g,'’'):''}','${property_id_no}','${block_no}','${plot_no}','${street_name?street_name.replace(/'/g,'’'):''}','${owner_name?owner_name.replace(/'/g,'’'):''}','${owner_type}','${owner_geder}','${telephone1}','${telephone2}','${occupancy_type}','${any_buildings}','${main_use}','${parcel_fenced}','${size_in_m2}','${doc_type}','${water}','${sewerage}','${electricity}','${street_lights}','${waste_disposal}','${geom}','${id}')`
   
   // res.status(200).json({sql})
   db.sequelize.query(sql)
@@ -76,7 +76,7 @@ export const savePolygon = (req, res) => {
 
 export const getPolygons = (req, res) => {
   const { query_type, file_type, parcel_id = '', structure_id = '' } = req.body;
-  db.sequelize.query(`select * from public.get_polygons('${query_type}','${file_type}','${parcel_id}','${structure_id}')`)
+  db.sequelize.query(`select * from public.__get_polygons('${query_type}','${file_type}','${parcel_id}','${structure_id}')`)
     .then((results) => {
       console.log(results)
       res.json({ success: true, row_to_json: results[0][0] })
