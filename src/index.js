@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 import cors from "cors";
 import models from "./models";
+import cluster from "cluster";
 // import { profileStorage, uploadLetter, surveyor } from "../config/multer";
 // import db from "./models";
 // const cloudinary = require('cloudinary');
@@ -37,6 +38,20 @@ cloudRoute(app);
 // passport config
 require("./config/passport")(passport);
 //create a server
-app.listen(port, function () {
-  console.log(`App listening at http://localhost:${port}`);
-});
+if(cluster.isMaster){
+  var cpuCount = require('os').cpus().length
+  for (let i =1; i<cpuCount; i++){
+    cluster.fork();;
+    console.log('Instance', i, ' is running')
+  }
+  cluster.on('online', worker=>{
+    console.log('Online', worker.process.pid, ' is online');
+  })
+  cluster.on('exit', (worker, code, signal)=>{
+    console.log('Exit', worker.process.pid, code+' is online', signal)
+  })
+}else{
+  app.listen(port, function () {
+    console.log(`App listening at http://localhost:${port}`);
+  });
+}

@@ -83,6 +83,6 @@ module.exports = (app) => {
     createUser
   );
   app.get('*', function(req, res){
-    res.status(404).json('<h1></h1><p>Page not found!</p>');
+    res.status(404).json('<h1>404</h1><p>Page not found!</p>');
   });
 };
