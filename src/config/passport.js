@@ -1,7 +1,7 @@
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 // import { placeholder } from "sequelize/types/lib/operators";
 import models from "../models";
-import db from "../models";
+
 const Users = models.User;
 
 const opts = {};

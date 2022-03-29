@@ -10,7 +10,9 @@ const { cloudRoute } = require("./util/Cloudinary");
 
 const app = express();
 
-app.use(express.json({limit:'50mb', extended: true, parameterLimit: 50000 }));
+app.use(
+  express.json({ limit: "500mb", extended: true, parameterLimit: 500000 })
+);
 
 let port = process.env.APP_PORT || 3012; // set the view engine to ejs
 app.set("view engine", "ejs");
@@ -38,19 +40,19 @@ cloudRoute(app);
 // passport config
 require("./config/passport")(passport);
 //create a server
-if(cluster.isMaster){
-  var cpuCount = require('os').cpus().length
-  for (let i =1; i<cpuCount; i++){
-    cluster.fork();;
-    console.log('Instance', i, ' is running')
+if (cluster.isMaster) {
+  var cpuCount = require("os").cpus().length;
+  for (let i = 1; i < cpuCount; i++) {
+    cluster.fork();
+    console.log("Instance", i, " is running");
   }
-  cluster.on('online', worker=>{
-    console.log('Online', worker.process.pid, ' is online');
-  })
-  cluster.on('exit', (worker, code, signal)=>{
-    console.log('Exit', worker.process.pid, code+' is online', signal)
-  })
-}else{
+  cluster.on("online", (worker) => {
+    console.log("Online", worker.process.pid, " is online");
+  });
+  cluster.on("exit", (worker, code, signal) => {
+    console.log("Exit", worker.process.pid, code + " is online", signal);
+  });
+} else {
   app.listen(port, function () {
     console.log(`App listening at http://localhost:${port}`);
   });

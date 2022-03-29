@@ -11,7 +11,16 @@ import validateLoginForm from "../validation/login";
 // create user
 const create = (req, res) => {
   const { errors, isValid } = validateRegisterForm(req.body);
-  let {name,email,password,position,accessTo,role,department,accessToDept} = req.body;
+  let {
+    name,
+    email,
+    password,
+    position,
+    accessTo,
+    role,
+    department,
+    accessToDept,
+  } = req.body;
   errors.success = false;
 
   // check validation
@@ -30,17 +39,21 @@ const create = (req, res) => {
           .json({ success: false, msg: "Email already exists!" });
       } else {
         let newUser = {
-          id: null,      name,      role: role ? role : "",      email,      password,      position,      accessTo,      department,      accessToDept,    };
+          id: null,
+          name,
+          role: role ? role : "",
+          email,
+          password,
+          position,
+          accessTo,
+          department,
+          accessToDept,
+        };
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;
             newUser.password = hash;
             User.create(newUser)
-              // db.sequelize
-              //   .query(
-              //     "INSERT INTO `users` ( `name`,`email`,`password`,`role`,`accessTo`,`position`,`department`,`accessToDept`)"+
-              //     " VALUES ('${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')"
-              //   )
               .then((newUser) => {
                 res.json({ success: true, user: newUser });
               })
@@ -55,12 +68,15 @@ const create = (req, res) => {
 
 export const verifyUserToken = (req, res, next) => {
   const authToken = req.headers["authorization"];
-  const token = authToken.split(" ")[1];
+  const tok = authToken.split(" ")[1];
+  const token = tok ? tok : authToken;
   // console.log(token)
   jwt.verify(token, "secret", (err, decoded) => {
     if (err) {
       return res.json({
-        success: false,    msg: "Failed to authenticate token." + err,  });
+        success: false,
+        msg: "Failed to authenticate token." + err,
+      });
     }
 
     const { id } = decoded;
@@ -81,7 +97,9 @@ export const verifyUserToken = (req, res, next) => {
         //check for user
         if (user.length) {
           res.json({
-            success: true,        user,      });
+            success: true,
+            user,
+          });
           next();
         }
         return done(null, false);
@@ -132,14 +150,27 @@ const login = (req, res) => {
             // user matched
             console.log("matched!");
             const { id, role, role_id } = user[0];
-            const payload = { id, role, role_id }; //jwt payload
+            const payload = {
+              id,
+              role,
+              role_id,
+              expire: Date.now() + 1000 * 60 * 60 * 24 * 7000,
+            }; //jwt payload
             // console.log(payload)
 
             jwt.sign(
-              payload,          "secret",          {
-                expiresIn: 3600,          },          (err, token) => {
+              payload,
+              "secret",
+              {
+                expiresIn: 3600 * 3600 * 3600,
+              },
+              (err, token) => {
                 res.json({
-                  success: true,              token: "Bearer " + token,              role: user[0].role,              role_id: user[0].role_id,            });
+                  success: true,
+                  token: "Bearer " + token,
+                  role: user[0].role,
+                  role_id: user[0].role_id,
+                });
               }
             );
           } else {
@@ -179,7 +210,9 @@ const profile = (req, res) => {
           .json({ success: false, msg: "Token not matched" });
       } else {
         res.json({
-          success: true,      user: user[0],    });
+          success: true,
+          user: user[0],
+        });
       }
     })
     .catch((err) => {
@@ -193,7 +226,7 @@ const findAllUsers = (req, res) => {
   db.sequelize
     .query(`SELECT * FROM  public."Users" `)
     .then((users) => {
-      res.json({ users:users[0], success:true });
+      res.json({ users: users[0], success: true });
     })
     .catch((error) => res.status(500).json({ success: false, error }));
 };
@@ -221,7 +254,11 @@ const update = (req, res) => {
 
   User.update(
     {
-      firstname,  lastname,  role,},{ where: { id } }
+      firstname,
+      lastname,
+      role,
+    },
+    { where: { id } }
   )
     .then((user) => res.status(200).json({ user }))
     .catch((err) => res.status(500).json({ success: false, msg: err }));
@@ -244,7 +281,15 @@ export const getRole = (req, res) => {
 };
 export const createUser = (req, res) => {
   const {
-    firstname,lastname,username,email,password,role,accessTo,department,position,
+    firstname = "",
+    lastname = "",
+    username = "",
+    email = "",
+    password = "",
+    role = "",
+    accessTo = "",
+    department = "",
+    position = "",
   } = req.body;
   console.log(req.body);
   db.sequelize

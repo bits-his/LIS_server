@@ -12,7 +12,7 @@ import {
   getRole,
   createUser,
 } from "../controllers/user";
-const {api} =config;
+const { api } = config;
 module.exports = (app) => {
   // create a new user
   app.post(
@@ -75,14 +75,9 @@ module.exports = (app) => {
     getRole
   );
 
-  app.post(
-    `${api}/create/user`,
-    passport.authenticate("jwt", {
-      session: false,
-    }),
-    createUser
-  );
-  app.get('*', function(req, res){
-    res.status(404).json('<h1>404</h1><p>Page not found!</p>');
+  app.post(`${api}/create/user`, createUser);
+  
+  app.get("*", function (req, res) {
+    res.status(404).json("<h1>404</h1><p>Page not found!</p>");
   });
 };
