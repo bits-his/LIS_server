@@ -2,7 +2,7 @@ require("dotenv").config();
 const config = module.exports;
 const env = process.env.NODE_ENV;
 
-config.api = env === "development" ? `/api/v1/gis` : "/v1";
+config.api = "/v1";
 
 const userRoles = (config.userRoles = {
   guest: 1,
