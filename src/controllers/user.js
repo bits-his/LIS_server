@@ -69,7 +69,7 @@ const create = (req, res) => {
 export const verifyUserToken = (req, res, next) => {
   const authToken = req.headers["authorization"];
   const tok = authToken.split(" ")[1];
-  const token = tok ? tok : authToken;
+  const token = tok.length > 10 ? tok : authToken;
   // console.log(token)
   jwt.verify(token, "secret", (err, decoded) => {
     if (err) {
@@ -80,7 +80,13 @@ export const verifyUserToken = (req, res, next) => {
     }
 
     const { id } = decoded;
+    db.sequelize
+      .query(
+        `UPDATE * FROM  public."Users" SET token = 'Bearer ${token}'  WHERE id=${id}`
+      )
 
+      .then((user) => console.log({ success: true, user }))
+      .catch((err) => console.log({ success: false, msg: err }));
     // User.findOne({ where: { id } })
 
     //   .then((user) => {

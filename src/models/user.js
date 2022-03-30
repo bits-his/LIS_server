@@ -10,6 +10,7 @@ export default (sequelize, DataTypes) => {
     department: DataTypes.STRING,
     accessToDept: DataTypes.STRING,
     accessToFiles: DataTypes.STRING,
+    token: DataTypes.STRING,
     signature: DataTypes.STRING,
   });
 

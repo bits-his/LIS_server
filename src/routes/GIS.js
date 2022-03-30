@@ -33,7 +33,7 @@ module.exports = (app) => {
     veryfyJwt,
     getSummaryReport
   );
-  app.get(`/api/v1/get-summary-report`, veryfyJwt, apiSummaryReport);
-  app.get(`/api/v1/get-polygons`, veryfyJwt, getApiPolygons);
-  app.get(`/api/v1/get-parcels`, veryfyJwt, getApiParcels);
+  app.get(`${api}/get-summary-report`, veryfyJwt, apiSummaryReport);
+  app.get(`${api}/get-polygons`, veryfyJwt, getApiPolygons);
+  app.get(`${api}/get-parcels`, veryfyJwt, getApiParcels);
 };
