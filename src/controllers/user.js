@@ -80,13 +80,6 @@ export const verifyUserToken = (req, res, next) => {
     }
 
     const { id } = decoded;
-    db.sequelize
-      .query(
-        `UPDATE * FROM  public."Users" SET token = 'Bearer ${token}'  WHERE id=${id}`
-      )
-
-      .then((user) => console.log({ success: true, user }))
-      .catch((err) => console.log({ success: false, msg: err }));
     // User.findOne({ where: { id } })
 
     //   .then((user) => {
@@ -120,7 +113,6 @@ export const verifyUserToken = (req, res, next) => {
 const login = (req, res) => {
   const { errors, isValid } = validateLoginForm(req.body);
 
-  // check validation
   if (!isValid) {
     return res
       .status(400)
@@ -128,12 +120,6 @@ const login = (req, res) => {
   }
 
   const { email, password } = req.body;
-
-  // User.findAll({
-  //   where: {
-  //     email,
-  //   },
-  // })
   db.sequelize
     .query(`SELECT * FROM public."Users" WHERE email='${email}'`)
     .then((found) => {
@@ -187,6 +173,50 @@ const login = (req, res) => {
           }
         })
         .catch((err) => res.status(500).json({ success: false, msg: err }));
+    })
+    .catch((err) => {
+      res.status(500).json({ success: false, msg: err });
+      console.log(err);
+    });
+};
+
+export const getToken = (req, res) => {
+  const { email } = req.query;
+  db.sequelize
+    .query(`SELECT * FROM public."Users" WHERE email='${email}'`)
+    .then((found) => {
+      let user = found[0];
+      console.log(user);
+      //check for user
+      if (!user.length) {
+        errors.success = false;
+        errors.msg = "User not found!";
+        return res.status(404).json(errors);
+      }
+
+      // let originalPassword = user[0].password;
+
+      const { id, role, role_id } = user[0];
+      const payload = {
+        id,
+        role,
+        role_id,
+        expire: Date.now() + 1000 * 60 * 60 * 24 * 7000,
+      };
+      jwt.sign(
+        payload,
+        "secret",
+        {
+          expiresIn: 3600 * 3600 * 3600,
+        },
+        (err, token) => {
+          res.json({
+            success: true,
+            token: "Bearer " + token,
+            user: user[0],
+          });
+        }
+      );
     })
     .catch((err) => {
       res.status(500).json({ success: false, msg: err });
@@ -255,18 +285,22 @@ const findById = (req, res) => {
 
 // update a user's info
 const update = (req, res) => {
-  let { firstname, lastname, HospitalId, role, image } = req.body;
-  const id = req.params.userId;
-
+  let { name, role, image, accessTo, token, id } = req.body;
+  console.log({ Body: req.body });
   User.update(
     {
-      firstname,
-      lastname,
+      name,
       role,
+      accessTo,
+      token,
+      image,
     },
     { where: { id } }
   )
-    .then((user) => res.status(200).json({ user }))
+    .then((user) => {
+      console.log({ user });
+      res.status(200).json({ user });
+    })
     .catch((err) => res.status(500).json({ success: false, msg: err }));
 };
 
@@ -281,7 +315,7 @@ const deleteUser = (req, res) => {
 export const getRole = (req, res) => {
   const { id } = req.user.id;
   db.sequelize
-    .query(`CALL get_position()`)
+    .query(`CALL get_position`)
     .then((results) => res.json({ success: true, results: results[0] }))
     .catch((err) => res.status(500).json({ err }));
 };
@@ -304,7 +338,7 @@ export const createUser = (req, res) => {
         firstname + " " + lastname
       }","${role}","${accessTo}","${username}","${email}","${password}")`
     )
-    .then((results) => res.json({ success: true }))
+    .then((result) => res.json({ success: true, result }))
     .catch((err) => res.status(500).json({ success: false, error: err }));
 };
 export { create, login, findAllUsers, findById, update, deleteUser, profile };

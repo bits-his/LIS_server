@@ -220,6 +220,7 @@ export const getPolygons = (req, res) => {
 export const getApiPolygons = (req, res) => {
   const {
     query_type = "polygons",
+    data_type = "query_type",
     file_type = "parcels",
     parcel_id = 0,
     structure_id = 0,
@@ -233,7 +234,7 @@ export const getApiPolygons = (req, res) => {
       `select * from public.___get_polygons(:query_type,:file_type,:lga,:parcel_id,:structure_id,:from,:to,:limit)`,
       {
         replacements: {
-          query_type,
+          query_type: data_type ? data_type : query_type,
           file_type,
           lga,
           parcel_id: parseInt(parcel_id),

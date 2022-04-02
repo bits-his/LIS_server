@@ -11,6 +11,7 @@ import {
   profile,
   getRole,
   createUser,
+  getToken,
 } from "../controllers/user";
 const { api } = config;
 module.exports = (app) => {
@@ -25,6 +26,9 @@ module.exports = (app) => {
 
   // user login
   app.post(`${api}/users/login`, login);
+  // user login
+  app.get(`${api}/users/get-token`, getToken);
+
   app.get(
     `${api}/user/verify`,
     passport.authenticate("jwt", { session: false }),
@@ -34,9 +38,9 @@ module.exports = (app) => {
   //retrieve all users
   app.get(
     `${api}/users`,
-    passport.authenticate("jwt", {
-      session: false,
-    }),
+    // passport.authenticate("jwt", {
+    //   session: false,
+    // }),
     findAllUsers
   );
 
@@ -50,14 +54,7 @@ module.exports = (app) => {
   );
 
   // update a user with id
-  app.put(
-    `${api}/users/:userId`,
-    passport.authenticate("jwt", {
-      session: false,
-    }),
-    allowOnly(config.accessLevels.user, update)
-  );
-
+  app.post(`${api}/users/update`, update);
   // delete a user
   app.delete(
     `${api}/users/:userId`,
@@ -76,7 +73,7 @@ module.exports = (app) => {
   );
 
   app.post(`${api}/create/user`, createUser);
-  
+
   app.get("*", function (req, res) {
     res.status(404).json("<h1>404</h1><p>Page not found!</p>");
   });
