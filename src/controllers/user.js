@@ -1,14 +1,14 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import passport from 'passport';
-import moment from 'moment';
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import passport from "passport";
+import moment from "moment";
 
-import db from '../models';
+import db from "../models";
 const User = db.User;
 
 // load input validation
-import validateRegisterForm from '../validation/register';
-import validateLoginForm from '../validation/login';
+import validateRegisterForm from "../validation/register";
+import validateLoginForm from "../validation/login";
 
 // create user
 const create = (req, res) => {
@@ -30,22 +30,22 @@ const create = (req, res) => {
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  let _id = moment().format('DDMMyyyyhhmmss');
+  let _id = moment().format("DDMMyyyyhhmmss");
   console.log(_id);
 
   // User.findAll({ where: { email } }).then((user) => {
   db.sequelize
-    .query(`SELECT * FROM public.users WHERE email='${email}'`)
+    .query(`SELECT * FROM users WHERE email='${email}'`)
     .then((user) => {
       if (user[0].length) {
         return res
           .status(400)
-          .json({ success: false, email: 'Email already exists!' });
+          .json({ success: false, email: "Email already exists!" });
       } else {
         let newUser = {
           name,
           // username,
-          role: role ? role : '',
+          role: role ? role : "",
           email,
           password,
           position,
@@ -62,7 +62,7 @@ const create = (req, res) => {
             // User.create(newUser)
             db.sequelize
               .query(
-                `INSERT INTO public."users" ("id","name","email","password","role","accessTo","position","department","accessToDept") VALUES ('${_id}', '${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')`
+                `INSERT INTO "users" ("id","name","email","password","role","accessTo","position","department","accessToDept") VALUES ('${_id}', '${name}','${email}','${hash}','${role}','${accessTo}','${position}','${department}','${accessToDept}')`
               )
               .then((user) => {
                 res.json({ success: true, user });
@@ -77,14 +77,14 @@ const create = (req, res) => {
 };
 
 export const verifyUserToken = (req, res) => {
-  const authToken = req.headers['authorization'];
-  const token = authToken.split(' ')[1];
+  const authToken = req.headers["authorization"];
+  const token = authToken.split(" ")[1];
   // console.log(token)
-  jwt.verify(token, 'secret', (err, decoded) => {
+  jwt.verify(token, "secret", (err, decoded) => {
     if (err) {
       return res.json({
         success: false,
-        msg: 'Failed to authenticate token.',
+        msg: "Failed to authenticate token.",
         err,
       });
     }
@@ -93,11 +93,11 @@ export const verifyUserToken = (req, res) => {
 
     // User.findAll({ where: { id } })
     db.sequelize
-      .query(`SELECT * FROM public.users WHERE id='${id}'`)
+      .query(`SELECT * FROM users WHERE id='${id}'`)
       .then((found) => {
         let user = found[0];
         if (!user.length) {
-          return res.json({ msg: 'user not found' });
+          return res.json({ msg: "user not found" });
         }
 
         res.json({
@@ -128,13 +128,13 @@ const login = (req, res) => {
   //   },
   // })
   db.sequelize
-    .query(`SELECT * FROM public.users WHERE email='${email}'`)
+    .query(`SELECT * FROM users WHERE email='${email}'`)
     .then((found) => {
       let user = found[0];
       console.log(user);
       //check for user
       if (!user.length) {
-        errors.email = 'User not found!';
+        errors.email = "User not found!";
         return res.status(404).json(errors);
       }
 
@@ -146,27 +146,27 @@ const login = (req, res) => {
         .then((isMatch) => {
           if (isMatch) {
             // user matched
-            console.log('matched!');
+            console.log("matched!");
             const { id, username } = user[0];
             const payload = { id, username }; //jwt payload
             // console.log(payload)
 
             jwt.sign(
               payload,
-              'secret',
+              "secret",
               {
                 expiresIn: 3600,
               },
               (err, token) => {
                 res.json({
                   success: true,
-                  token: 'Bearer ' + token,
+                  token: "Bearer " + token,
                   role: user[0].role,
                 });
               }
             );
           } else {
-            errors.password = 'Password not correct';
+            errors.password = "Password not correct";
             errors.success = false;
             console.log(errors);
             return res.status(400).json(errors);
@@ -184,7 +184,7 @@ const login = (req, res) => {
 const findAllUsers = (req, res) => {
   // User.findAll()
   db.sequelize
-    .query(`SELECT * FROM public.users `)
+    .query(`SELECT * FROM users `)
     .then((user) => {
       res.json({ user });
     })
@@ -197,10 +197,10 @@ const findById = (req, res) => {
 
   // User.findAll({ where: { id } })
   db.sequelize
-    .query(`SELECT * FROM public.users `)
+    .query(`SELECT * FROM users `)
     .then((user) => {
       if (!user.length) {
-        return res.json({ msg: 'user not found' });
+        return res.json({ msg: "user not found" });
       }
       res.json({ user });
     })
@@ -229,8 +229,8 @@ const deleteUser = (req, res) => {
   const id = req.params.userId;
 
   User.destroy({ where: { id } })
-    .then(() => res.status.json({ msg: 'User has been deleted successfully!' }))
-    .catch((err) => res.status(500).json({ msg: 'Failed to delete!' }));
+    .then(() => res.status.json({ msg: "User has been deleted successfully!" }))
+    .catch((err) => res.status(500).json({ msg: "Failed to delete!" }));
 };
 
 export { create, login, findAllUsers, findById, update, deleteUser };
